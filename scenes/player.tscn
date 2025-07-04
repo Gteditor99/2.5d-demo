@@ -1,0 +1,156 @@
+[gd_scene load_steps=13 format=3 uid="uid://be762sc1tjfxt"]
+
+[ext_resource type="Script" uid="uid://jemxf1emkayb" path="res://scenes/player.gd" id="1_3vyb7"]
+[ext_resource type="Texture2D" uid="uid://ycykmkgtlde5" path="res://PNG_0001.png" id="3_tuyoq"]
+[ext_resource type="Texture2D" uid="uid://cmbfpfw8dc0ef" path="res://PNG_0002.png" id="4_fjrip"]
+[ext_resource type="Texture2D" uid="uid://blgmmrkpoofgu" path="res://PNG_0003.png" id="5_smehm"]
+[ext_resource type="Texture2D" uid="uid://dqbjow4xbq5tk" path="res://PNG_0004.png" id="6_ur7pv"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u8vuu"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qlg0r"]
+atlas = ExtResource("3_tuyoq")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y4r1p"]
+atlas = ExtResource("3_tuyoq")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d2wvv"]
+atlas = ExtResource("4_fjrip")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3v2ag"]
+atlas = ExtResource("5_smehm")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jej6c"]
+atlas = ExtResource("6_ur7pv")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_dqkch"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qlg0r")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y4r1p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d2wvv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3v2ag")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jej6c")
+}],
+"loop": true,
+"name": &"shoot",
+"speed": 12.0
+}]
+
+[node name="Player" type="CharacterBody3D" groups=["Player"]]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_3vyb7")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+fov = 90.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.960099, 0)
+shape = SubResource("CapsuleShape3D_u8vuu")
+
+[node name="RayCast3D" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+target_position = Vector3(0, 0, -1000)
+collision_mask = 3
+debug_shape_custom_color = Color(0.94902, 0, 0, 1)
+debug_shape_thickness = 1
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="GunBase" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 6
+size_flags_vertical = 6
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CanvasLayer/GunBase"]
+modulate = Color(0.61339, 0.61339, 0.61339, 1)
+position = Vector2(12, -322)
+scale = Vector2(0.25, 0.25)
+sprite_frames = SubResource("SpriteFrames_dqkch")
+animation = &"shoot"
+
+[node name="DeathScreen" type="Label" parent="CanvasLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+
+[node name="Panel" type="Panel" parent="CanvasLayer/DeathScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -74.0
+offset_top = -19.5
+offset_right = 74.0
+offset_bottom = 47.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/DeathScreen/Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -49.5
+offset_right = 49.5
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "DeathScreen"
+
+[node name="Button" type="Button" parent="CanvasLayer/DeathScreen/Panel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -32.5
+offset_top = -31.0
+offset_right = 32.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Restart"
+
+[connection signal="animation_finished" from="CanvasLayer/GunBase/AnimatedSprite2D" to="." method="shoot_animation_done"]

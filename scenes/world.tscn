@@ -1,0 +1,96 @@
+[gd_scene load_steps=12 format=3 uid="uid://di1rif4as0m1i"]
+
+[ext_resource type="PackedScene" uid="uid://be762sc1tjfxt" path="res://scenes/player.tscn" id="1_nnsk1"]
+[ext_resource type="PackedScene" uid="uid://b5m1jg2d1hsch" path="res://scenes/enemy.tscn" id="2_4wyf3"]
+[ext_resource type="PackedScene" uid="uid://bs2jm62cmkbrk" path="res://addons/instant-realistic-light/light_scene.tscn" id="3_4wyf3"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_rwgxs"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rwgxs"]
+albedo_color = Color(0.462291, 0.462291, 0.46229, 1)
+metallic = 0.75
+metallic_specular = 0.35
+anisotropy_enabled = true
+ao_enabled = true
+subsurf_scatter_enabled = true
+subsurf_scatter_strength = 0.4
+backlight_enabled = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_nnsk1"]
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_nnsk1"]
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_gn88m"]
+ground_color = Color(0, 0, 0, 1)
+
+[sub_resource type="Sky" id="Sky_tyhie"]
+sky_material = SubResource("PhysicalSkyMaterial_gn88m")
+radiance_size = 2
+
+[sub_resource type="Environment" id="Environment_f8w8m"]
+background_mode = 2
+background_intensity = 100000.0
+sky = SubResource("Sky_tyhie")
+tonemap_mode = 3
+tonemap_white = 8.0
+ssao_enabled = true
+ssao_detail = 2.0
+sdfgi_enabled = true
+sdfgi_bounce_feedback = 0.9
+glow_enabled = true
+glow_normalized = true
+glow_bloom = 0.2
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.01
+volumetric_fog_gi_inject = 1.14
+volumetric_fog_anisotropy = 0.7
+volumetric_fog_sky_affect = 0.295
+adjustment_saturation = 1.17
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_qo5hu"]
+exposure_multiplier = 3.069
+auto_exposure_scale = 0.22
+auto_exposure_speed = 0.8
+dof_blur_far_distance = 1.44
+dof_blur_near_distance = 0.01
+auto_exposure_min_sensitivity = 8.01
+
+[node name="World" type="Node3D"]
+
+[node name="Environment" type="Node3D" parent="."]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Environment"]
+transform = Transform3D(0.336922, 0, 0, 0, 1.61833, 0, 0, 0, 0.311536, 0.344556, 0.811945, -0.760507)
+mesh = SubResource("BoxMesh_rwgxs")
+surface_material_override/0 = SubResource("StandardMaterial3D_rwgxs")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Environment"]
+transform = Transform3D(0.336922, 0, 0, 0, 1.19913, 0, 0, 0, 0.311536, -0.674414, 0.587338, 0.335913)
+mesh = SubResource("BoxMesh_rwgxs")
+surface_material_override/0 = SubResource("StandardMaterial3D_rwgxs")
+
+[node name="Floor" type="MeshInstance3D" parent="Environment"]
+mesh = SubResource("PlaneMesh_nnsk1")
+surface_material_override/0 = SubResource("StandardMaterial3D_rwgxs")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Environment/Floor"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Floor/StaticBody3D"]
+shape = SubResource("WorldBoundaryShape3D_nnsk1")
+
+[node name="Player" parent="." instance=ExtResource("1_nnsk1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.094317, 0)
+peek_offset_x = 0.35
+peek_transition_speed = 50.0
+bob_amplitude = 0.05
+bob_amplitude_roll = 0.02
+
+[node name="Enemy" parent="." instance=ExtResource("2_4wyf3")]
+move_speed = 5.0
+
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." instance=ExtResource("3_4wyf3")]
+environment = SubResource("Environment_f8w8m")
+camera_attributes = SubResource("CameraAttributesPractical_qo5hu")
