@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://di1rif4as0m1i"]
+[gd_scene load_steps=8 format=3 uid="uid://di1rif4as0m1i"]
 
 [ext_resource type="PackedScene" uid="uid://be762sc1tjfxt" path="res://scenes/player.tscn" id="1_nnsk1"]
 [ext_resource type="PackedScene" uid="uid://b5m1jg2d1hsch" path="res://scenes/enemy.tscn" id="2_4wyf3"]
@@ -19,41 +19,6 @@ backlight_enabled = true
 [sub_resource type="PlaneMesh" id="PlaneMesh_nnsk1"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_nnsk1"]
-
-[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_gn88m"]
-ground_color = Color(0, 0, 0, 1)
-
-[sub_resource type="Sky" id="Sky_tyhie"]
-sky_material = SubResource("PhysicalSkyMaterial_gn88m")
-radiance_size = 2
-
-[sub_resource type="Environment" id="Environment_f8w8m"]
-background_mode = 2
-background_intensity = 100000.0
-sky = SubResource("Sky_tyhie")
-tonemap_mode = 3
-tonemap_white = 8.0
-ssao_enabled = true
-ssao_detail = 2.0
-sdfgi_enabled = true
-sdfgi_bounce_feedback = 0.9
-glow_enabled = true
-glow_normalized = true
-glow_bloom = 0.2
-volumetric_fog_enabled = true
-volumetric_fog_density = 0.01
-volumetric_fog_gi_inject = 1.14
-volumetric_fog_anisotropy = 0.7
-volumetric_fog_sky_affect = 0.295
-adjustment_saturation = 1.17
-
-[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_qo5hu"]
-exposure_multiplier = 3.069
-auto_exposure_scale = 0.22
-auto_exposure_speed = 0.8
-dof_blur_far_distance = 1.44
-dof_blur_near_distance = 0.01
-auto_exposure_min_sensitivity = 8.01
 
 [node name="World" type="Node3D"]
 
@@ -87,10 +52,116 @@ bob_amplitude = 0.05
 bob_amplitude_roll = 0.02
 
 [node name="Enemy" parent="." instance=ExtResource("2_4wyf3")]
-move_speed = 5.0
+move_speed = 0.0
+
+[node name="Enemy2" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.91408, 0, -2.51116)
+move_speed = 0.0
+
+[node name="Enemy3" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.58517, 0, -0.649438)
+move_speed = 0.0
+
+[node name="Enemy4" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.06075, 0, 4.32959)
+move_speed = 0.0
+
+[node name="Enemy5" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.61521, 0, -3.76674)
+move_speed = 0.0
+
+[node name="Enemy6" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.95318, 0, 3.52861)
+move_speed = 0.0
+
+[node name="Enemy7" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 4)
+move_speed = 0.0
+
+[node name="Enemy8" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.13895, 0, 1.27723)
+move_speed = 0.0
+
+[node name="Enemy9" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.52861, 0, 1.27723)
+move_speed = 0.0
+
+[node name="Enemy10" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1606, 0, 7.68502)
+move_speed = 0.0
+
+[node name="Enemy11" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.87918, 0, 8.26951)
+move_speed = 0.0
+
+[node name="Enemy12" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.9839, 0, 8.61588)
+move_speed = 0.0
+
+[node name="Enemy13" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.09214, 0, 0.108239)
+move_speed = 0.0
+
+[node name="Enemy14" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.96225, 0, -5.56352)
+move_speed = 0.0
+
+[node name="Enemy15" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.52442, 0, -5.78)
+move_speed = 0.0
+
+[node name="Enemy16" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.53348, 0, -2.90082)
+move_speed = 0.0
+
+[node name="Enemy17" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.173182, 0, -4.45948)
+move_speed = 0.0
+
+[node name="Enemy18" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+move_speed = 0.0
+
+[node name="Enemy19" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+move_speed = 0.0
+
+[node name="Enemy20" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.96644, 0, -2.38127)
+move_speed = 0.0
+
+[node name="Enemy21" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.29536, 0, -6.47273)
+move_speed = 0.0
+
+[node name="Enemy22" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.46367, 0, -5.49858)
+move_speed = 0.0
+
+[node name="Enemy23" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.29116, 0, 1.77513)
+move_speed = 0.0
+
+[node name="Enemy24" parent="." instance=ExtResource("2_4wyf3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.21184, 5.16725, 1.88866)
+move_speed = 0.0
 
 [node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." instance=ExtResource("3_4wyf3")]
-environment = SubResource("Environment_f8w8m")
-camera_attributes = SubResource("CameraAttributesPractical_qo5hu")
+[node name="WorldEnvironment" parent="." instance=ExtResource("3_4wyf3")]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.08395, 4.21056, 7.87705)
+light_color = Color(1, 0.175655, 0.11205, 1)
+light_energy = 50.0
+light_indirect_energy = 10.0
+omni_range = 4096.0
+omni_attenuation = 2.0
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.12089, 9.46313, -7.7113)
+light_color = Color(3.56168e-06, 0.941899, 0.13878, 1)
+light_energy = 50.0
+light_indirect_energy = 10.0
+omni_range = 4096.0
+omni_attenuation = 2.0

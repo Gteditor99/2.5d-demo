@@ -39,6 +39,14 @@ const JUMP_VELOCITY = 4.5
 #region Nodes
 @onready var head_node: Node3D = $Head
 @onready var collision_shape_node: CollisionShape3D = $CollisionShape3D
+@onready var gun_raycast: RayCast3D = $RayCast3D
+@onready var gun_anim_sprite: AnimatedSprite3D = $Head/AnimatedSprite3D
+@onready var barrel_node: Node3D = $Head/AnimatedSprite3D/barrel
+#endregion
+
+#region Scenes
+var bullet = load("res://scenes/bullet.tscn")
+var instance
 #endregion
 
 #region Private Variables
@@ -85,7 +93,6 @@ func _ready() -> void:
 	_current_head_y_base = _initial_head_y
 
 	_setup_collision_shape()
-	$CanvasLayer/GunBase/AnimatedSprite2D.animation_finished.connect(shoot_animation_done)
 
 
 func _setup_collision_shape() -> void:
@@ -101,7 +108,7 @@ func _setup_collision_shape() -> void:
 	if shape.height != crouch_collision_height_standing:
 		push_warning("Initial CapsuleShape3D height (" + str(shape.height) + ") does not match crouch_collision_height_standing (" + str(crouch_collision_height_standing) + "). Ensure they are consistent or adjust export var.")
 		# Optionally, force it: shape.height = crouch_collision_height_standing
-	
+
 	_standing_collider_y_pos = collision_shape_node.position.y
 	# Calculate crouching collider Y pos based on height difference, assuming collider shrinks from top down
 	_crouching_collider_y_pos = _standing_collider_y_pos - (crouch_collision_height_standing - crouch_collision_height_crouching) / 2.0
@@ -126,7 +133,7 @@ func _physics_process(delta: float) -> void:
 	_update_crouch_visuals_and_collision(delta)
 	_update_peek_visuals(delta)
 	_update_head_bob(delta)
-	
+
 	move_and_slide()
 
 #-----------------------------------------------------------------------------
@@ -166,7 +173,7 @@ func _process_movement_input(delta: float) -> void:
 	var is_peeking_right = Input.is_action_pressed("peek_right") and not _is_crouching
 
 	if is_peeking_left and not is_peeking_right:
-		_peek_target_offset_x = - peek_offset_x
+		_peek_target_offset_x = -peek_offset_x
 		_peek_target_rotation_z_rad = deg_to_rad(peek_rotation_z_degrees)
 	elif is_peeking_right and not is_peeking_left:
 		_peek_target_offset_x = peek_offset_x
@@ -186,7 +193,7 @@ func _process_jump_input(delta: float) -> void:
 func _handle_mouse_look(event: InputEventMouseMotion) -> void:
 	# Horizontal rotation (Yaw) - applied to the CharacterBody3D itself
 	self.rotate_y(-event.relative.x * mouse_sensitivity)
-	
+
 	# Vertical rotation (Pitch) - applied to the Head node
 	_current_pitch = clamp(_current_pitch - event.relative.y * mouse_sensitivity, -_pitch_limit_radians, _pitch_limit_radians)
 	head_node.rotation.x = _current_pitch
@@ -194,18 +201,18 @@ func _handle_mouse_look(event: InputEventMouseMotion) -> void:
 func shoot() -> void:
 	if !_can_shoot:
 		return
-	_can_shoot = false # Prevent further shooting until reset
-
-	# Ensure the shoot animation doesn't loop, so "animation_finished" signal is emitted.
-	$CanvasLayer/GunBase/AnimatedSprite2D.sprite_frames.set_animation_loop("shoot", false)
-	$CanvasLayer/GunBase/AnimatedSprite2D.play("shoot")
+	# Since there's only one looping "default" animation now, we just play it.
+	# The concept of a separate shoot animation that finishes is gone with the scene changes.
+	gun_anim_sprite.play("default")
+	instance = bullet.instantiate() # Create a new bullet instance
+	instance.get_node("RayCast3D").add_exception(self)
+	print("Added player to bullet's collision exception list.")
+	instance.position = barrel_node.global_position
+	instance.transform.basis = $Head.global_transform.basis
+	get_parent().add_child(instance) # Add bullet to the scene tree
 	# sound
-	if $RayCast3D.is_colliding() and $RayCast3D.get_collider().has_method("kill"):
-		$RayCast3D.get_collider().kill()
-
-func shoot_animation_done() -> void:
-	_can_shoot = true # Allow shooting again after animation completes
-	$CanvasLayer/GunBase/AnimatedSprite2D.play("idle") # Reset to idle animation
+	# if $RayCast3D.is_colliding() and $RayCast3D.get_collider().has_method("kill"):
+	# 	$RayCast3D.get_collider().kill()
 
 func kill() -> void:
 	_is_dead = true
@@ -296,10 +303,10 @@ func _update_head_bob(delta: float) -> void:
 			effective_bob_frequency *= sprint_bob_multiplier
 			effective_bob_amplitude *= sprint_bob_multiplier
 			effective_bob_amplitude_roll *= sprint_bob_multiplier
-		
+
 		_bob_time += delta * effective_bob_frequency # Scale bob time by frequency
 		var bob_phase = _bob_time * 2.0 * PI # Bob time now directly relates to cycles via frequency adjustment
-		
+
 		var bob_offset_y = sin(bob_phase) * effective_bob_amplitude
 		head_node.position.y = _current_head_y_base + bob_offset_y
 		bob_offset_roll_this_frame = sin(bob_phase * 0.5) * effective_bob_amplitude_roll # Slower roll
@@ -308,7 +315,7 @@ func _update_head_bob(delta: float) -> void:
 		_bob_time = lerp(_bob_time, floor(_bob_time), delta * 15.0) # Smoothly reset phase towards an integer
 		head_node.position.y = lerp(head_node.position.y, _current_head_y_base, delta * 20.0)
 		# bob_offset_roll_this_frame remains 0.0
-	
+
 	# Combine peek roll and bob roll
 	head_node.rotation.z = _current_applied_peek_roll + bob_offset_roll_this_frame
 #endregion
