@@ -1,0 +1,163 @@
+[gd_scene load_steps=15 format=3 uid="uid://jnc8p6dkjh3f"]
+
+[ext_resource type="Script" uid="uid://jemxf1emkayb" path="res://scripts/entities/player.gd" id="1_3vyb7"]
+[ext_resource type="Texture2D" uid="uid://3krm5n4xhutn" path="res://assets/sprites/PNG_0001.png" id="3_tuyoq"]
+[ext_resource type="Texture2D" uid="uid://b8cjw22eilmgk" path="res://assets/sprites/PNG_0002.png" id="4_fjrip"]
+[ext_resource type="Texture2D" uid="uid://dfeswci648epo" path="res://assets/sprites/PNG_0003.png" id="5_smehm"]
+[ext_resource type="PackedScene" uid="uid://collpnpisosr1" path="res://scenes/components/MovementComponent.tscn" id="6_fjrip"]
+[ext_resource type="Texture2D" uid="uid://d6o0wck1leod" path="res://assets/sprites/PNG_0004.png" id="6_ur7pv"]
+[ext_resource type="PackedScene" uid="uid://bhovii1sudi1k" path="res://scenes/components/HealthComponent.tscn" id="7_smehm"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qlg0r"]
+atlas = ExtResource("3_tuyoq")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tuyoq"]
+atlas = ExtResource("4_fjrip")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fjrip"]
+atlas = ExtResource("5_smehm")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_smehm"]
+atlas = ExtResource("6_ur7pv")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ur7pv"]
+atlas = ExtResource("3_tuyoq")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ur7pv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qlg0r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tuyoq")
+}, {
+"duration": 2.0,
+"texture": SubResource("AtlasTexture_fjrip")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_smehm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ur7pv")
+}],
+"loop": false,
+"name": &"default",
+"speed": 12.0
+}]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u8vuu"]
+
+[node name="Player" type="CharacterBody3D" groups=["Player"]]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_3vyb7")
+sprint_speed_multiplier = null
+sprint_bob_multiplier = null
+crouch_speed_multiplier = null
+crouch_downward_offset = null
+crouch_collision_height_standing = null
+crouch_collision_height_crouching = null
+crouch_transition_speed = null
+peek_offset_x = 1.0
+peek_rotation_z_degrees = 10.0
+peek_transition_speed = 8.0
+mouse_sensitivity = null
+pitch_limit_degrees = null
+bob_frequency = null
+bob_amplitude = 0.02
+bob_amplitude_roll = null
+WASD_TILT_DEGREES = 10.0
+TILT_SMOOTHING_SPEED = 2.0
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+fov = 100.0
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Head"]
+transform = Transform3D(0.026, 0, 0, 0, 0.025, 0, 0, 0, 0.025, 0.026, -0.09, -0.805527)
+alpha_cut = 1
+sprite_frames = SubResource("SpriteFrames_ur7pv")
+
+[node name="barrel" type="Node3D" parent="Head/AnimatedSprite3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.794283, -4.57919, -2)
+
+[node name="RayCast3D" type="RayCast3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.0500001)
+target_position = Vector3(0, 0, -1000)
+collision_mask = 3
+debug_shape_custom_color = Color(0.94902, 0, 0, 1)
+debug_shape_thickness = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.960099, 0)
+shape = SubResource("CapsuleShape3D_u8vuu")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="DeathScreen" type="Label" parent="CanvasLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+
+[node name="Panel" type="Panel" parent="CanvasLayer/DeathScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -74.0
+offset_top = -19.5
+offset_right = 74.0
+offset_bottom = 47.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/DeathScreen/Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -49.5
+offset_right = 49.5
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "DeathScreen"
+
+[node name="Button" type="Button" parent="CanvasLayer/DeathScreen/Panel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -32.5
+offset_top = -31.0
+offset_right = 32.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Restart"
+
+[node name="MovementComponent" parent="." instance=ExtResource("6_fjrip")]
+
+[node name="HealthComponent" parent="." instance=ExtResource("7_smehm")]

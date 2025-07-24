@@ -1,8 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://di1rif4as0m1i"]
+[gd_scene load_steps=10 format=3 uid="uid://ty0s7a3cfm1m"]
 
-[ext_resource type="PackedScene" uid="uid://be762sc1tjfxt" path="res://scenes/player.tscn" id="1_nnsk1"]
-[ext_resource type="PackedScene" uid="uid://b5m1jg2d1hsch" path="res://scenes/enemy.tscn" id="2_4wyf3"]
-[ext_resource type="PackedScene" uid="uid://bs2jm62cmkbrk" path="res://addons/instant-realistic-light/light_scene.tscn" id="3_4wyf3"]
+[ext_resource type="PackedScene" uid="uid://bs2jm62cmkbrk" path="res://addons/instant-realistic-light/light_scene.tscn" id="1_rwgxs"]
+[ext_resource type="PackedScene" uid="uid://jnc8p6dkjh3f" path="res://scenes/characters/player/player.tscn" id="2_4wyf3"]
+[ext_resource type="PackedScene" uid="uid://dqu6jkudhtb4l" path="res://addons/CSGStairMaker3D.tscn" id="3_4wyf3"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_rwgxs"]
 
@@ -15,6 +15,12 @@ ao_enabled = true
 subsurf_scatter_enabled = true
 subsurf_scatter_strength = 0.4
 backlight_enabled = true
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_4mrxx"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_7r4gi"]
+data = PackedVector3Array(-0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_nnsk1"]
 
@@ -30,10 +36,20 @@ transform = Transform3D(0.336922, 0, 0, 0, 1.61833, 0, 0, 0, 0.311536, 0.344556,
 mesh = SubResource("BoxMesh_rwgxs")
 surface_material_override/0 = SubResource("StandardMaterial3D_rwgxs")
 
+[node name="StaticBody3D" type="StaticBody3D" parent="Environment/MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/MeshInstance3D/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_4mrxx")
+
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Environment"]
 transform = Transform3D(0.336922, 0, 0, 0, 1.19913, 0, 0, 0, 0.311536, -0.674414, 0.587338, 0.335913)
 mesh = SubResource("BoxMesh_rwgxs")
 surface_material_override/0 = SubResource("StandardMaterial3D_rwgxs")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Environment/MeshInstance3D2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/MeshInstance3D2/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_7r4gi")
 
 [node name="Floor" type="MeshInstance3D" parent="Environment"]
 mesh = SubResource("PlaneMesh_nnsk1")
@@ -44,111 +60,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_rwgxs")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Floor/StaticBody3D"]
 shape = SubResource("WorldBoundaryShape3D_nnsk1")
 
-[node name="Player" parent="." instance=ExtResource("1_nnsk1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.094317, 0)
-peek_offset_x = 0.35
-peek_transition_speed = 50.0
-bob_amplitude = 0.05
-bob_amplitude_roll = 0.02
-
-[node name="Enemy" parent="." instance=ExtResource("2_4wyf3")]
-move_speed = 0.0
-
-[node name="Enemy2" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.91408, 0, -2.51116)
-move_speed = 0.0
-
-[node name="Enemy3" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.58517, 0, -0.649438)
-move_speed = 0.0
-
-[node name="Enemy4" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.06075, 0, 4.32959)
-move_speed = 0.0
-
-[node name="Enemy5" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.61521, 0, -3.76674)
-move_speed = 0.0
-
-[node name="Enemy6" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.95318, 0, 3.52861)
-move_speed = 0.0
-
-[node name="Enemy7" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 4)
-move_speed = 0.0
-
-[node name="Enemy8" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.13895, 0, 1.27723)
-move_speed = 0.0
-
-[node name="Enemy9" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.52861, 0, 1.27723)
-move_speed = 0.0
-
-[node name="Enemy10" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1606, 0, 7.68502)
-move_speed = 0.0
-
-[node name="Enemy11" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.87918, 0, 8.26951)
-move_speed = 0.0
-
-[node name="Enemy12" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.9839, 0, 8.61588)
-move_speed = 0.0
-
-[node name="Enemy13" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.09214, 0, 0.108239)
-move_speed = 0.0
-
-[node name="Enemy14" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.96225, 0, -5.56352)
-move_speed = 0.0
-
-[node name="Enemy15" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.52442, 0, -5.78)
-move_speed = 0.0
-
-[node name="Enemy16" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.53348, 0, -2.90082)
-move_speed = 0.0
-
-[node name="Enemy17" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.173182, 0, -4.45948)
-move_speed = 0.0
-
-[node name="Enemy18" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
-move_speed = 0.0
-
-[node name="Enemy19" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
-move_speed = 0.0
-
-[node name="Enemy20" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.96644, 0, -2.38127)
-move_speed = 0.0
-
-[node name="Enemy21" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.29536, 0, -6.47273)
-move_speed = 0.0
-
-[node name="Enemy22" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.46367, 0, -5.49858)
-move_speed = 0.0
-
-[node name="Enemy23" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.29116, 0, 1.77513)
-move_speed = 0.0
-
-[node name="Enemy24" parent="." instance=ExtResource("2_4wyf3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.21184, 5.16725, 1.88866)
-move_speed = 0.0
-
 [node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
-
-[node name="WorldEnvironment" parent="." instance=ExtResource("3_4wyf3")]
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.08395, 4.21056, 7.87705)
@@ -165,3 +77,13 @@ light_energy = 50.0
 light_indirect_energy = 10.0
 omni_range = 4096.0
 omni_attenuation = 2.0
+
+[node name="WorldEnvironment" parent="." instance=ExtResource("1_rwgxs")]
+
+[node name="Player" parent="." instance=ExtResource("2_4wyf3")]
+
+[node name="CSGStairMaker3D" parent="." instance=ExtResource("3_4wyf3")]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -6.52211, 1.51532, -7.11583)
+use_collision = true
+size = Vector3(6.61438, 2.96551, 1.09908)
+num_stairs = 16

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://r6nod71vv802"]
+
+[ext_resource type="Script" uid="uid://dbem7hstu8kus" path="res://scripts/components/stair_stepping_component.gd" id="1_abcde"]
+
+[node name="StairSteppingComponent" type="Node"]
+script = ExtResource("1_abcde")

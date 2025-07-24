@@ -11,9 +11,17 @@ config_version=5
 [application]
 
 config/name="2.5D"
-run/main_scene="uid://di1rif4as0m1i"
+run/main_scene="uid://ty0s7a3cfm1m"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
+run/physics_ticks_per_second=60
+run/vsync/vsync_mode=1
+run/quality/msaa_3d=1
+run/quality/use_taa=false
+
+[display]
+
+window/vsync/vsync_mode=2
 
 [editor_plugins]
 
@@ -84,9 +92,9 @@ jump={
 
 [physics]
 
+common/physics_ticks_per_second=144
 3d/physics_engine="Jolt Physics"
 
 [rendering]
 
-anti_aliasing/quality/msaa_3d=1
-anti_aliasing/quality/screen_space_aa=1
+anti_aliasing/quality/msaa_3d=2
