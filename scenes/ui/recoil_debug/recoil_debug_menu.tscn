@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://b5w5g5f5d5e5"]
+
+[ext_resource type="Script" uid="uid://bpaqufxaya6hy" path="res://scenes/ui/recoil_debug/recoil_debug_menu.gd" id="1_abcde"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_12345"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_udfa4"]
+
+[node name="RecoilDebugMenu" type="PanelContainer"]
+offset_right = 484.0
+offset_bottom = 363.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_12345")
+script = ExtResource("1_abcde")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="DataContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.2
+
+[node name="TitleLabel" type="Label" parent="HBoxContainer/DataContainer"]
+layout_mode = 2
+text = "procedural recoil v1 :3"
+label_settings = SubResource("LabelSettings_udfa4")
+horizontal_alignment = 1
+
+[node name="GraphContainer" type="GridContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 3

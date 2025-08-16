@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bekrjtsakixek"]
+
+[ext_resource type="Script" uid="uid://ce2emfr3vo8q" path="res://scripts/components/view_model_component.gd" id="1_2j04x"]
+
+[node name="ViewModelComponent" type="Node"]
+script = ExtResource("1_2j04x")

@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "notion": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@notionhq/notion-mcp-server"
+      ],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer ntn_Z6111882184a5XSjwjExxTwWYsD9hyV2MNd4QHGzXCW460\", \"Notion-Version\": \"2022-06-28\"}"
+      },
+      "alwaysAllow": [
+        "API-patch-page",
+        "API-post-database-query",
+        "API-post-page",
+        "API-post-search",
+        "API-get-user",
+        "API-get-users",
+        "API-get-self",
+        "API-retrieve-a-block",
+        "API-update-a-block",
+        "API-retrieve-a-page",
+        "API-create-a-database",
+        "API-retrieve-a-database",
+        "API-retrieve-a-page-property",
+        "API-get-block-children"
+      ]
+    }
+  }
+}

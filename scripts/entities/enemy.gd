@@ -20,7 +20,7 @@ func take_damage(amount: int) -> void:
 func _ready() -> void:
 	# Connect to the health component's died signal
 	health_component.died.connect(_on_death)
-	health_component.health_updated.connect(_on_health_updated)
+	health_component.health_changed.connect(_on_health_changed)
 	
 	# Initialize state
 	_set_state(EnemyState.CHASE) # Start by chasing for now
@@ -44,7 +44,6 @@ func _physics_process(_delta: float) -> void:
 			# For example: $AttackTimer.start()
 			pass
 		EnemyState.IDLE:
-			
 			pass # No specific action in idle state for now
 		EnemyState.DEAD:
 			pass # No action when dead
@@ -92,7 +91,7 @@ func _on_death() -> void:
 	$AnimatedSprite3D.play("death") # Assuming you have a 'death' animation
 	$CollisionShape3D.disabled = true
 
-func _on_health_updated(new_health: int) -> void:
+func _on_health_changed(new_health: int, max_health: int) -> void:
 	# This function can be used to trigger a "hurt" animation or effect
 	# when the enemy takes damage but is not yet dead.
 	if new_health > 0:

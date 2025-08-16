@@ -26,7 +26,6 @@ extends CharacterBody3D
 @export var bob_amplitude: float = 0.1
 @export var bob_amplitude_roll: float = 0.03
 #endregion
-
 #region Stair Stepping Constants
 const STAIRS_FEELING_COEFFICIENT: float = 2.5
 const SPEED_CLAMP_AFTER_JUMP_COEFFICIENT = 0.4
@@ -37,27 +36,28 @@ const SPEED_CLAMP_AFTER_JUMP_COEFFICIENT = 0.4
 @onready var head_node = $Head
 @onready var collision_shape_node: CollisionShape3D = $CollisionShape3D
 @onready var gun_raycast: RayCast3D = $Head/RayCast3D
-@onready var gun_anim_sprite: AnimatedSprite3D = $Head/AnimatedSprite3D
-@onready var barrel_node: Node3D = $Head/AnimatedSprite3D/barrel
+var gun_anim_sprite: AnimationPlayer
+var barrel_node: Node3D
+var weapon_instance: Node3D
+var _recoil_debug_menu_instance: PanelContainer
+const RecoilDebugMenu = preload("res://scenes/ui/recoil_debug/recoil_debug_menu.tscn")
 #endregion
 # --- Components ---
 @onready var movement_component: MovementComponent = $MovementComponent
 @onready var health_component: HealthComponent = $HealthComponent
 @onready var stair_stepping_component: StairSteppingComponent = $StairSteppingComponent
-#endregion
+@onready var weapon_system_component: WeaponSystemComponent = $WeaponSystemComponent
+@onready var view_model_component: ViewModelComponent = $ViewModelComponent
 
-#region Scenes
-var bullet = load("res://scenes/weapons/bullet.tscn")
-var instance
 #endregion
 
 #region Private Variables
 # --- Player State ---
-enum PlayerState {IDLE, WALKING, SPRINTING, JUMPING, CROUCHING, PEEKING_LEFT, PEEKING_RIGHT}
+enum PlayerState {IDLE, WALKING, SPRINTING, JUMPING, CROUCHING, PEEKING_LEFT, PEEKING_RIGHT, AIMING}
 var _current_player_state: PlayerState = PlayerState.IDLE
 var _is_sprinting: bool = false
 var _is_crouching: bool = false
-var _wants_to_shoot: bool = false
+var _is_aiming: bool = false
 
 # --- Camera ---
 var _pitch_limit_radians: float
@@ -101,6 +101,7 @@ var movement: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
+	print("Player ready")
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	_pitch_limit_radians = deg_to_rad(pitch_limit_degrees)
 
@@ -110,8 +111,51 @@ func _ready() -> void:
 
 	_setup_collision_shape()
 	
+	# Instantiate and setup weapon
+	if weapon_system_component and weapon_system_component.weapon_data and weapon_system_component.weapon_data.weapon_scene:
+		weapon_instance = weapon_system_component.weapon_data.weapon_scene.instantiate()
+		head_node.add_child(weapon_instance)
+		weapon_instance.position = weapon_system_component.weapon_data.idle_view_offset
+		var initial_rotation_deg = weapon_system_component.weapon_data.idle_view_rotation
+		weapon_instance.rotation = Vector3(deg_to_rad(initial_rotation_deg.x), deg_to_rad(initial_rotation_deg.y), deg_to_rad(initial_rotation_deg.z))
+		
+		# Find nodes within the instantiated weapon scene
+		var anim_players = weapon_instance.find_children("*", "AnimationPlayer", true, false)
+		if not anim_players.is_empty():
+			gun_anim_sprite = anim_players[0]
+		else:
+			gun_anim_sprite = null
+
+		barrel_node = weapon_instance.find_child("spawnpoint", true, false)
+		if not barrel_node:
+			push_warning("Barrel node ('spawnpoint') not found in the weapon scene. Projectiles may not spawn correctly.")
+
+		# Sync animation speed with fire rate
+		if gun_anim_sprite:
+			var anim = gun_anim_sprite.get_animation("animation")
+			if anim:
+				var fire_rate = weapon_system_component.weapon_data.rounds_per_minute / 60.0
+				var anim_length = anim.length
+				gun_anim_sprite.speed_scale = anim_length * fire_rate
+		else:
+			push_error("AnimationPlayer not found in the weapon scene.")
+
+	# Setup ViewModelComponent
+	if view_model_component:
+		view_model_component.camera = $Head/Camera3D
+		view_model_component.weapon_node = weapon_instance
+
 	# Connect to the health component's died signal
 	health_component.died.connect(_on_death)
+	
+	# Connect to the weapon system component's weapon_fired signal
+	if weapon_system_component:
+		weapon_system_component.weapon_fired.connect(_on_weapon_fired)
+
+
+func _on_weapon_fired():
+	if gun_anim_sprite and gun_anim_sprite.has_animation("animation"):
+		gun_anim_sprite.play("animation")
 
 
 func _setup_collision_shape() -> void:
@@ -124,13 +168,17 @@ func _setup_collision_shape() -> void:
 	_crouching_collider_y_pos = _standing_collider_y_pos - (crouch_collision_height_standing - crouch_collision_height_crouching) / 2.0
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
+	if Input.is_action_just_pressed("debug"):
+		Debug.log("Debug action pressed")
+		toggle_recoil_debug_menu()
+
 	if Input.is_action_just_pressed("mouse_capture_toggle"):
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		else:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	
+
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		_handle_mouse_look(event)
 
@@ -151,9 +199,6 @@ func _physics_process(delta: float) -> void:
 	if not health_component or health_component.current_health <= 0:
 		return # Stop processing if dead
 
-	if _wants_to_shoot and gun_anim_sprite.frame == 1:
-		_fire_bullet()
-		_wants_to_shoot = false
 
 	_handle_input()
 	_update_player_state()
@@ -165,8 +210,11 @@ func _physics_process(delta: float) -> void:
 #region Input & State
 #-----------------------------------------------------------------------------
 func _handle_input() -> void:
+	# Aiming
+	_is_aiming = Input.is_action_pressed("aim")
+
 	# Sprinting
-	_is_sprinting = Input.is_action_pressed("sprint")
+	_is_sprinting = Input.is_action_pressed("sprint") and not _is_aiming # Cannot sprint while aiming
 
 	# Crouching
 	if Input.is_action_just_pressed("crouch"):
@@ -178,18 +226,26 @@ func _handle_input() -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor() and not _is_crouching:
 		movement_component.jump()
 
-	# Shooting
-	if Input.is_action_just_pressed("shoot"):
-		_wants_to_shoot = true
-		if gun_anim_sprite.is_playing():
-			# If animation is playing and we are past the firing frame,
-			# jump back to frame 2 to create a shorter loop for rapid fire.
-			if gun_anim_sprite.frame > 1:
-				gun_anim_sprite.frame = 0
-				_fire_bullet()
-		else:
-			# If animation is not playing, start it.
-			gun_anim_sprite.play("default")
+	# Weapon Input
+	weapon_system_component.handle_input()
+		
+
+func toggle_recoil_debug_menu():
+	print("Toggling recoil debug menu.")
+	if not _recoil_debug_menu_instance:
+		print("Creating new recoil debug menu instance.")
+		_recoil_debug_menu_instance = RecoilDebugMenu.instantiate()
+		get_tree().get_root().add_child(_recoil_debug_menu_instance)
+		_recoil_debug_menu_instance.recoil_data = weapon_system_component.weapon_data.recoil_data
+		_recoil_debug_menu_instance.visible = true
+		print("Recoil data assigned: ", _recoil_debug_menu_instance.recoil_data)
+	else:
+		_recoil_debug_menu_instance.visible = not _recoil_debug_menu_instance.visible
+		print("Toggling visibility to: ", _recoil_debug_menu_instance.visible)
+		if _recoil_debug_menu_instance.visible:
+			_recoil_debug_menu_instance.recoil_data = weapon_system_component.weapon_data.recoil_data
+			print("Recoil data reassigned: ", _recoil_debug_menu_instance.recoil_data)
+
 
 func _update_player_state() -> void:
 	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
@@ -197,6 +253,8 @@ func _update_player_state() -> void:
 
 	if not is_on_floor():
 		_current_player_state = PlayerState.JUMPING
+	elif _is_aiming:
+		_current_player_state = PlayerState.AIMING
 	elif is_peeking and not _is_crouching:
 		_current_player_state = PlayerState.PEEKING_LEFT if Input.is_action_pressed("peek_left") else PlayerState.PEEKING_RIGHT
 	elif _is_crouching:
@@ -207,6 +265,7 @@ func _update_player_state() -> void:
 		_current_player_state = PlayerState.WALKING
 	else:
 		_current_player_state = PlayerState.IDLE
+	_update_viewmodel_state()
 #endregion
 
 #-----------------------------------------------------------------------------
@@ -285,14 +344,6 @@ func _handle_mouse_look(event: InputEventMouseMotion) -> void:
 	self.rotate_y(-event.relative.x * mouse_sensitivity)
 	_current_pitch = clamp(_current_pitch - event.relative.y * mouse_sensitivity, -_pitch_limit_radians, _pitch_limit_radians)
 	head_node.rotation.x = _current_pitch
-
-
-func _fire_bullet() -> void:
-	instance = bullet.instantiate()
-	instance.get_node("RayCast3D").add_exception(self)
-	instance.position = barrel_node.global_position
-	instance.transform.basis = head_node.global_transform.basis
-	get_parent().add_child(instance)
 
 
 func _on_death() -> void:
@@ -385,3 +436,23 @@ func _update_stair_head_offset(delta: float) -> void:
 
 
 #endregion
+
+func _update_viewmodel_state() -> void:
+	if not view_model_component:
+		return
+		
+	var weapon_data = weapon_system_component.weapon_data
+	if not weapon_data:
+		return
+
+	match _current_player_state:
+		PlayerState.AIMING:
+			view_model_component.set_state(ViewModelComponent.State.AIMING, weapon_data)
+		PlayerState.SPRINTING:
+			view_model_component.set_state(ViewModelComponent.State.SPRINTING, weapon_data)
+		_:
+			view_model_component.set_state(ViewModelComponent.State.IDLE, weapon_data)
+
+
+func get_barrel_node() -> Node3D:
+	return barrel_node

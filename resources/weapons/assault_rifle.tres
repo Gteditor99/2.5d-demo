@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=6 format=3 uid="uid://cjywig4ldndko"]
+
+[ext_resource type="PackedScene" uid="uid://ckotr225fdib7" path="res://assets/models/type88.gltf" id="1_0nnpp"]
+[ext_resource type="Script" uid="uid://ct3jmbc7fmgm1" path="res://scripts/resources/WeaponData/WeaponData.gd" id="1_abcde"]
+[ext_resource type="PackedScene" uid="uid://blguwf5ugythv" path="res://scenes/weapons/bullet.tscn" id="2_f5ubh"]
+[ext_resource type="Resource" uid="uid://d3jss3w0q2w3e" path="res://resources/weapons/assault_rifle_recoil.tres" id="3_abcde"]
+
+[sub_resource type="Curve" id="Curve_0nnpp"]
+_limits = [-1.0, 1.0, 0.0, 1.0]
+_data = [Vector2(0.00164835, 0.00934386), 0.0, 0.0, 0, 0, Vector2(0.115934, 0.991902), 0.0, 0.0, 0, 0, Vector2(0.263187, -0.95162), 0.0, 0.0, 0, 0, Vector2(0.355495, 0.47363), 0.0, 0.0, 0, 0, Vector2(0.441209, -0.0014534), 0.0, 0.0, 0, 0]
+point_count = 5
+
+[resource]
+script = ExtResource("1_abcde")
+damage = 25
+rounds_per_minute = 500
+range = 1000.0
+magazine_size = 30
+reload_time = 2.5
+available_fire_modes = Array[String](["semi-auto", "full-auto"])
+default_fire_mode = "full-auto"
+burst_count = 3
+spread_angle = 0.0
+recoil_data = ExtResource("3_abcde")
+projectile_scene = ExtResource("2_f5ubh")
+weapon_scene = ExtResource("1_0nnpp")
+idle_view_offset = Vector3(0.085, -0.495, -0.93)
+idle_view_rotation = null
+idle_fov = 75.0
+idle_transition_speed = 10.0
+sprint_view_offset = Vector3(0.095, -0.475, -1.1)
+sprint_view_rotation = Vector3(44.2, 0, 26)
+sprint_fov = 85.0
+sprint_transition_speed = 8.0
+ads_view_offset = Vector3(0, -0.425, -0.93)
+ads_view_rotation = Vector3(0, 0, 0)
+ads_fov = 50.0
+ads_transition_speed = 15.0
+item_name = "type88"
+item_description = "type88 description"
+model = ExtResource("1_0nnpp")
+components = Array[Resource]([])

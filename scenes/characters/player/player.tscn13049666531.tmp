@@ -1,0 +1,223 @@
+[gd_scene load_steps=28 format=3 uid="uid://jnc8p6dkjh3f"]
+
+[ext_resource type="Script" uid="uid://jemxf1emkayb" path="res://scripts/entities/player.gd" id="1_42irl"]
+[ext_resource type="Texture2D" uid="uid://3krm5n4xhutn" path="res://assets/sprites/PNG_0001.png" id="3_tuyoq"]
+[ext_resource type="Texture2D" uid="uid://b8cjw22eilmgk" path="res://assets/sprites/PNG_0002.png" id="4_fjrip"]
+[ext_resource type="Texture2D" uid="uid://dfeswci648epo" path="res://assets/sprites/PNG_0003.png" id="5_smehm"]
+[ext_resource type="PackedScene" uid="uid://ckotr225fdib7" path="res://assets/models/type88.gltf" id="6_42irl"]
+[ext_resource type="PackedScene" uid="uid://collpnpisosr1" path="res://scenes/components/MovementComponent.tscn" id="6_fjrip"]
+[ext_resource type="Texture2D" uid="uid://d6o0wck1leod" path="res://assets/sprites/PNG_0004.png" id="6_ur7pv"]
+[ext_resource type="PackedScene" uid="uid://bhovii1sudi1k" path="res://scenes/components/HealthComponent.tscn" id="7_smehm"]
+[ext_resource type="PackedScene" uid="uid://r6nod71vv802" path="res://scenes/components/StairSteppingComponent.tscn" id="8_xuses"]
+[ext_resource type="PackedScene" uid="uid://bhh8tefiqqfvh" path="res://scenes/components/WeaponComponent.tscn" id="10_djydg"]
+[ext_resource type="Resource" uid="uid://p7xpsvtcwwjy" path="res://resources/weapons/ak74m.tres" id="11_bsn6e"]
+[ext_resource type="PackedScene" uid="uid://sas4icepds48" path="res://scenes/components/CurveRecoilComponent.tscn" id="12_blysn"]
+[ext_resource type="PackedScene" uid="uid://bekrjtsakixek" path="res://scenes/components/ViewModelComponent.tscn" id="12_bsn6e"]
+[ext_resource type="Script" uid="uid://ba4t7hj7hquy" path="res://scripts/resources/RecoilData/CurveRecoilPattern.gd" id="13_hv5x3"]
+[ext_resource type="PackedScene" uid="uid://cocstg3qjex3v" path="res://scenes/components/RecoilAnimationComponent.tscn" id="15_ykrpk"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qlg0r"]
+atlas = ExtResource("3_tuyoq")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tuyoq"]
+atlas = ExtResource("4_fjrip")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fjrip"]
+atlas = ExtResource("5_smehm")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_smehm"]
+atlas = ExtResource("6_ur7pv")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ur7pv"]
+atlas = ExtResource("3_tuyoq")
+region = Rect2(0, 0, 2560, 2560)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ur7pv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qlg0r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tuyoq")
+}, {
+"duration": 2.0,
+"texture": SubResource("AtlasTexture_fjrip")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_smehm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ur7pv")
+}],
+"loop": false,
+"name": &"default",
+"speed": 12.0
+}]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_mk55u"]
+
+[sub_resource type="Curve" id="Curve_i1nod"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.1, 1), 0.0, 0.0, 0, 0, Vector2(0.3, 0.6), 0.0, 0.0, 0, 0, Vector2(1, 0.2), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="Curve" id="Curve_4kqyw"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.3, 0.4), 0.0, 0.0, 0, 0, Vector2(0.7, 0.1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="Curve" id="Curve_svuau"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.2, 0.1), 0.0, 0.0, 0, 0, Vector2(0.8, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="Curve" id="Curve_ro20i"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.15, 0.3), 0.0, 0.0, 0, 0, Vector2(0.5, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="Resource" id="Resource_8y75b"]
+script = ExtResource("13_hv5x3")
+pitch_curve = SubResource("Curve_i1nod")
+yaw_curve = SubResource("Curve_ro20i")
+roll_curve = SubResource("Curve_svuau")
+recovery_curve = SubResource("Curve_4kqyw")
+recovery_duration = 1.0
+recovery_speed = 1.0
+curve_duration = 0.3
+base_intensity = 1.0
+randomization_factor = 0.2
+semi_auto_multiplier = 1.0
+full_auto_multiplier = 0.8
+full_auto_accumulation = true
+max_accumulation = 3.0
+accumulation_rate = 1.2
+ads_pitch_multiplier = 0.6
+ads_yaw_multiplier = 0.7
+ads_roll_multiplier = 0.5
+ads_recovery_multiplier = 1.2
+smooth_transitions = true
+transition_smoothing = 0.3
+per_axis_randomization = true
+metadata/_custom_type_script = "uid://ba4t7hj7hquy"
+
+[node name="Player" type="CharacterBody3D" groups=["Player"]]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_42irl")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Head"]
+transform = Transform3D(0.026, 0, 0, 0, 0.025, 0, 0, 0, 0.025, 0.026, -0.09, -0.805527)
+visible = false
+alpha_cut = 1
+sprite_frames = SubResource("SpriteFrames_ur7pv")
+
+[node name="barrel_old" type="Node3D" parent="Head/AnimatedSprite3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.794283, -4.57919, -2)
+
+[node name="barrel" type="Node3D" parent="Head/AnimatedSprite3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.96375, -1.47357, -38.718)
+
+[node name="RayCast3D" type="RayCast3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.0500001)
+visible = false
+target_position = Vector3(0, 0, -1000)
+collision_mask = 3
+debug_shape_custom_color = Color(0.94902, 0, 0, 1)
+debug_shape_thickness = 1
+
+[node name="blockbench_export" parent="Head" instance=ExtResource("6_42irl")]
+transform = Transform3D(1, 0, 0, 0, 0.997808, 0.0661694, 0, -0.0661694, 0.997808, 0.52, -0.495, -0.93)
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_mk55u")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="DeathScreen" type="Label" parent="CanvasLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+
+[node name="Panel" type="Panel" parent="CanvasLayer/DeathScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -74.0
+offset_top = -19.5
+offset_right = 74.0
+offset_bottom = 47.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/DeathScreen/Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -49.5
+offset_right = 49.5
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "DeathScreen"
+
+[node name="Button" type="Button" parent="CanvasLayer/DeathScreen/Panel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -32.5
+offset_top = -31.0
+offset_right = 32.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Restart"
+
+[node name="HealthComponent" parent="." instance=ExtResource("7_smehm")]
+
+[node name="MovementComponent" parent="." node_paths=PackedStringArray("stair_stepping_component") instance=ExtResource("6_fjrip")]
+SPEED = 2.5
+stair_stepping_component = NodePath("../StairSteppingComponent")
+
+[node name="StairSteppingComponent" parent="." instance=ExtResource("8_xuses")]
+
+[node name="WeaponSystemComponent" parent="." node_paths=PackedStringArray("view_model_component") instance=ExtResource("10_djydg")]
+weapon_data = ExtResource("11_bsn6e")
+view_model_component = NodePath("../ViewModelComponent")
+
+[node name="ViewModelComponent" parent="." node_paths=PackedStringArray("camera") instance=ExtResource("12_bsn6e")]
+camera = NodePath("../Head/Camera3D")
+
+[node name="CurveRecoilComponent" parent="." instance=ExtResource("12_blysn")]
+recoil_pattern = SubResource("Resource_8y75b")
+fire_rate = 200.0
+is_full_auto = true
+debug_enabled = true
+debug_show_curves = true
+
+[node name="RecoilAnimationComponent" parent="." instance=ExtResource("15_ykrpk")]

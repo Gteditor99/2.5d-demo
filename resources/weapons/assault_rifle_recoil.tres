@@ -1,0 +1,52 @@
+[gd_resource type="RecoilData" script_class="RecoilData" load_steps=8 format=3 uid="uid://dmac0v02ouxie"]
+
+[ext_resource type="Script" uid="uid://bvfp2jqfa0lun" path="res://scripts/resources/RecoilData/RecoilData.gd" id="1_w7cfq"]
+
+[sub_resource type="Curve" id="Curve_p8tqf"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_v7xde"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_xkls2"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_e7v1a"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_h2g3f"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_i4j5g"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[resource]
+resource_local_to_scene = false
+resource_name = ""
+script = ExtResource("1_w7cfq")
+randomness = 0.005
+recovery_speed = 15.0
+positional_stiffness = 200.0
+positional_damping = 25.0
+rotational_stiffness = 200.0
+rotational_damping = 25.0
+positional_kick_up = 0.01
+positional_kick_back = 0.02
+positional_kick_horizontal = 0.015
+rotational_kick_up = 1.0
+rotational_kick_back = 0.5
+rotational_kick_horizontal = 0.8
+ads_positional_multiplier = 0.5
+ads_rotational_multiplier = 0.4
+positional_recoil_curve_x = SubResource("Curve_p8tqf")
+positional_recoil_curve_y = SubResource("Curve_v7xde")
+positional_recoil_curve_z = SubResource("Curve_xkls2")
+rotational_recoil_curve_x = SubResource("Curve_e7v1a")
+rotational_recoil_curve_y = SubResource("Curve_h2g3f")
+rotational_recoil_curve_z = SubResource("Curve_i4j5g")

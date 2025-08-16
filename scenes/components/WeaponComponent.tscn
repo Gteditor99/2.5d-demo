@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bhh8tefiqqfvh"]
+
+[ext_resource type="Script" uid="uid://c0cwb20uk38iy" path="res://scripts/components/weapon_component.gd" id="1_uxjmp"]
+
+[node name="WeaponComponent" type="Node"]
+script = ExtResource("1_uxjmp")
