@@ -1,17 +1,27 @@
-[gd_scene load_steps=20 format=3 uid="uid://jnc8p6dkjh3f"]
+[gd_scene load_steps=30 format=3 uid="uid://jnc8p6dkjh3f"]
 
 [ext_resource type="Script" uid="uid://jemxf1emkayb" path="res://scripts/entities/player.gd" id="1_42irl"]
 [ext_resource type="Texture2D" uid="uid://3krm5n4xhutn" path="res://assets/sprites/PNG_0001.png" id="3_tuyoq"]
 [ext_resource type="Texture2D" uid="uid://b8cjw22eilmgk" path="res://assets/sprites/PNG_0002.png" id="4_fjrip"]
 [ext_resource type="Texture2D" uid="uid://dfeswci648epo" path="res://assets/sprites/PNG_0003.png" id="5_smehm"]
 [ext_resource type="PackedScene" uid="uid://ckotr225fdib7" path="res://assets/models/type88.gltf" id="6_42irl"]
-[ext_resource type="PackedScene" uid="uid://collpnpisosr1" path="res://scenes/components/MovementComponent.tscn" id="6_fjrip"]
 [ext_resource type="Texture2D" uid="uid://d6o0wck1leod" path="res://assets/sprites/PNG_0004.png" id="6_ur7pv"]
-[ext_resource type="PackedScene" uid="uid://bhovii1sudi1k" path="res://scenes/components/HealthComponent.tscn" id="7_smehm"]
-[ext_resource type="PackedScene" uid="uid://r6nod71vv802" path="res://scenes/components/StairSteppingComponent.tscn" id="8_xuses"]
-[ext_resource type="PackedScene" uid="uid://bhh8tefiqqfvh" path="res://scenes/components/WeaponComponent.tscn" id="10_djydg"]
-[ext_resource type="Resource" uid="uid://p7xpsvtcwwjy" path="res://resources/weapons/ak74m.tres" id="11_bsn6e"]
-[ext_resource type="PackedScene" uid="uid://bekrjtsakixek" path="res://scenes/components/ViewModelComponent.tscn" id="12_bsn6e"]
+[ext_resource type="Script" uid="uid://d12iscnem4ruh" path="res://scripts/components/health_component.gd" id="7_bsn6e"]
+[ext_resource type="PackedScene" uid="uid://cnkp0k7ijt68d" path="res://assets/models/g17.gltf" id="8_8y75b"]
+[ext_resource type="Script" uid="uid://dtl6r2jl4bco3" path="res://scripts/components/movement_component.gd" id="8_blysn"]
+[ext_resource type="Script" uid="uid://ce2emfr3vo8q" path="res://scripts/components/view_model_component.gd" id="9_hv5x3"]
+[ext_resource type="Script" uid="uid://dbem7hstu8kus" path="res://scripts/components/stair_stepping_component.gd" id="10_ykrpk"]
+[ext_resource type="Script" uid="uid://c0cwb20uk38iy" path="res://scripts/components/weapon_component.gd" id="11_i1nod"]
+[ext_resource type="Resource" uid="uid://bcatpwtee3qsi" path="res://resources/weapons/type88.tres" id="12_i1nod"]
+[ext_resource type="Resource" uid="uid://clk0a6kbq0qxi" path="res://resources/weapons/glock17.tres" id="12_ro20i"]
+[ext_resource type="Resource" uid="uid://p7xpsvtcwwjy" path="res://resources/weapons/ak74m.tres" id="13_6nfx3"]
+[ext_resource type="Script" uid="uid://d0pclc6p6ru68" path="res://scripts/components/inventory_component.gd" id="13_blysn"]
+[ext_resource type="Resource" uid="uid://dbplc8pixnldw" path="res://resources/items/player_inventory.tres" id="14_i1nod"]
+[ext_resource type="Script" uid="uid://dopix31xdrmte" path="res://scripts/resources/ItemData/ItemData.gd" id="14_ykrpk"]
+[ext_resource type="Script" uid="uid://sx4v3xat4mbf" path="res://scripts/components/equipment_component.gd" id="16_4kqyw"]
+[ext_resource type="PackedScene" uid="uid://c0lc2wmgce4ua" path="res://scenes/ui/inventory/inventory.tscn" id="16_i1nod"]
+[ext_resource type="Script" uid="uid://bidrwoaynr0qf" path="res://scripts/components/interaction_component.gd" id="17_svuau"]
+[ext_resource type="PackedScene" uid="uid://c4w5s5w5s5w5" path="res://scenes/ui/hotbar/hotbar.tscn" id="21_tebod"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qlg0r"]
 atlas = ExtResource("3_tuyoq")
@@ -93,6 +103,14 @@ debug_shape_thickness = 1
 transform = Transform3D(1, 0, 0, 0, 0.997808, 0.0661694, 0, -0.0661694, 0.997808, 0.52, -0.495, -0.93)
 visible = false
 
+[node name="ViewModelComponent" type="Node3D" parent="Head" node_paths=PackedStringArray("camera")]
+script = ExtResource("9_hv5x3")
+camera = NodePath("../Camera3D")
+
+[node name="blockbench_export2" parent="Head" instance=ExtResource("8_8y75b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, -1.118)
+visible = false
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CylinderShape3D_mk55u")
@@ -154,17 +172,41 @@ grow_horizontal = 2
 grow_vertical = 0
 text = "Restart"
 
-[node name="HealthComponent" parent="." instance=ExtResource("7_smehm")]
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("7_bsn6e")
 
-[node name="MovementComponent" parent="." node_paths=PackedStringArray("stair_stepping_component") instance=ExtResource("6_fjrip")]
+[node name="MovementComponent" type="Node" parent="." node_paths=PackedStringArray("equipment_component")]
+script = ExtResource("8_blysn")
 SPEED = 2.5
-stair_stepping_component = NodePath("../StairSteppingComponent")
+equipment_component = NodePath("../EquipmentComponent")
 
-[node name="StairSteppingComponent" parent="." instance=ExtResource("8_xuses")]
+[node name="StairSteppingComponent" type="Node" parent="."]
+script = ExtResource("10_ykrpk")
 
-[node name="WeaponSystemComponent" parent="." node_paths=PackedStringArray("view_model_component") instance=ExtResource("10_djydg")]
-weapon_data = ExtResource("11_bsn6e")
-view_model_component = NodePath("../ViewModelComponent")
+[node name="WeaponSystemComponent" type="Node" parent="." node_paths=PackedStringArray("view_model_component")]
+script = ExtResource("11_i1nod")
+view_model_component = NodePath("../Head/ViewModelComponent")
+weapon_data = ExtResource("13_6nfx3")
 
-[node name="ViewModelComponent" parent="." node_paths=PackedStringArray("camera") instance=ExtResource("12_bsn6e")]
-camera = NodePath("../Head/Camera3D")
+[node name="InventoryComponent" type="Node" parent="." node_paths=PackedStringArray("equipment_component")]
+script = ExtResource("13_blysn")
+inventory = ExtResource("14_i1nod")
+equipment_component = NodePath("../EquipmentComponent")
+starting_items = Array[ExtResource("14_ykrpk")]([ExtResource("12_i1nod"), ExtResource("12_ro20i")])
+
+[node name="EquipmentComponent" type="Node" parent="." node_paths=PackedStringArray("weapon_system_component")]
+script = ExtResource("16_4kqyw")
+viewmodel_anchor = NodePath("../Head/ViewModelComponent")
+weapon_system_component = NodePath("../WeaponSystemComponent")
+
+[node name="InteractionComponent" type="Node" parent="." node_paths=PackedStringArray("raycast", "inventory_component", "equipment_component")]
+script = ExtResource("17_svuau")
+raycast = NodePath("../Head/RayCast3D")
+inventory_component = NodePath("../InventoryComponent")
+equipment_component = NodePath("../EquipmentComponent")
+
+[node name="Inventory" parent="." instance=ExtResource("16_i1nod")]
+inventory_component = NodePath("../InventoryComponent")
+
+[node name="Hotbar" parent="." node_paths=PackedStringArray("inventory_component") instance=ExtResource("21_tebod")]
+inventory_component = NodePath("../InventoryComponent")

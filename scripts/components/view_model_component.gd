@@ -1,8 +1,8 @@
 @tool
 class_name ViewModelComponent
-extends Node
+extends Node3D
 
-## This component manages the weapon's view model, handling transitions
+## This component manages the weapon\'s view model, handling transitions
 ## between states like idle, sprinting, and aiming (ADS).
 
 enum State {IDLE, SPRINTING, AIMING}
@@ -33,6 +33,7 @@ var _positional_recoil_velocity: Vector3
 var _rotational_recoil_velocity: Vector3
 var _positional_recoil_offset: Vector3
 var _rotational_recoil_offset: Vector3
+var _sway_rotation: Vector3 = Vector3.ZERO
 var _recoil_time: float = 0.0
 var _is_recording_recoil: bool = false
 var _recoil_history_positional: Array = []
@@ -42,16 +43,12 @@ var _recoil_history_rotational: Array = []
 func _ready():
 	# Add to group for easy discovery by debug systems
 	add_to_group("view_model")
-	
-	var weapon_nodes = get_tree().get_nodes_in_group("Weapon")
-	if weapon_nodes.size() > 0:
-		weapon_node = weapon_nodes[0] as Node3D
 
 func _process(delta: float) -> void:
 	if not weapon_node or not camera:
 		return
 
-	# Smoothly interpolate the weapon's position, rotation, and camera's FOV
+	# Smoothly interpolate the weapon\'s position, rotation, and camera\'s FOV
 	var target_rotation_rad = Vector3(deg_to_rad(_target_rotation.x), deg_to_rad(_target_rotation.y), deg_to_rad(_target_rotation.z))
 
 	if not _weapon_data: return
@@ -114,14 +111,14 @@ func _process(delta: float) -> void:
 			_rotational_recoil_velocity.z += rot_curve_z * recoil_data.rotational_kick_back * delta
 
 		weapon_node.position = _current_position + _positional_recoil_offset
-		weapon_node.rotation = _current_rotation + _rotational_recoil_offset
+		weapon_node.rotation = _current_rotation + _rotational_recoil_offset + _sway_rotation
 		
 		if _is_recording_recoil:
 			_recoil_history_positional.append(_positional_recoil_offset)
 			_recoil_history_rotational.append(_rotational_recoil_offset)
 	else:
 		weapon_node.position = _current_position
-		weapon_node.rotation = _current_rotation
+		weapon_node.rotation = _current_rotation + _sway_rotation
 
 	camera.fov = lerp(camera.fov, _target_fov, delta * _transition_speed)
 
@@ -176,7 +173,7 @@ func set_state(new_state: State, weapon_data: WeaponData) -> void:
 	if not weapon_data:
 		return
 
-	# Store current state for ADS detection
+	_weapon_data = weapon_data
 	_current_state = new_state
 
 	match new_state:
@@ -200,6 +197,11 @@ func set_state(new_state: State, weapon_data: WeaponData) -> void:
 		_current_position = _target_position
 		_current_rotation = Vector3(deg_to_rad(_target_rotation.x), deg_to_rad(_target_rotation.y), deg_to_rad(_target_rotation.z))
 		_is_first_state_set = true
+		
+		# Immediately update the weapon\'s transform to prevent it from being invisible on the first frame.
+		if weapon_node:
+			weapon_node.position = _current_position
+			weapon_node.rotation = _current_rotation
 
 func set_weapon_node(node: Node3D):
 	weapon_node = node
@@ -209,3 +211,6 @@ func set_weapon_system_component(node: Node):
 	_weapon_system_component = node
 	_weapon_data = node.weapon_data
 	Debug.log("RECOIL: set_weapon_system_component called - weapon_data: %s" % [_weapon_data != null])
+
+func apply_sway(sway: Vector3):
+	_sway_rotation = Vector3(deg_to_rad(sway.x), deg_to_rad(sway.y), deg_to_rad(sway.z))

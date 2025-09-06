@@ -9,50 +9,81 @@ signal weapon_fired
 signal weapon_reloaded
 signal weapon_reload_started
 
-@export var weapon_data: WeaponData
 @export var view_model_component: ViewModelComponent
 
+@export var weapon_data: WeaponData
 var current_ammo: int
-var reserve_ammo: int = 0 # You can expand this later for a full inventory system
+var reserve_ammo: int = 0
 var current_fire_mode: String
 var is_aiming: bool = false
-@onready var fire_rate_timer: Timer
-@onready var reload_timer: Timer
+@onready var fire_rate_timer: Timer = Timer.new()
+@onready var reload_timer: Timer = Timer.new()
 var projectile_pool: ProjectilePool
 var recoil_debug_menu_instance: PanelContainer
 
+var sway_target: Vector3 = Vector3.ZERO
+var current_sway: Vector3 = Vector3.ZERO
+
 func _ready():
-	fire_rate_timer = Timer.new()
-	reload_timer = Timer.new()
-	if not weapon_data:
-		push_error("WeaponSystemComponent requires a WeaponData resource.")
-		set_process(false)
-		set_physics_process(false)
+	# Timers are added to the scene tree so they can process.
+	add_child(fire_rate_timer)
+	add_child(reload_timer)
+
+func load_weapon_data(data: WeaponData):
+	# If the same weapon is already loaded, do nothing.
+	if self.weapon_data and self.weapon_data.resource_path == data.resource_path:
 		return
+	self.weapon_data = data
+	set_process(true)
+	set_physics_process(true)
 
 	current_ammo = weapon_data.magazine_size
-	if view_model_component:
-		view_model_component.set_weapon_system_component(self)
 	current_fire_mode = weapon_data.default_fire_mode
 
-	# Setup timers
 	fire_rate_timer.wait_time = 60.0 / weapon_data.rounds_per_minute
 	fire_rate_timer.one_shot = true
-	add_child(fire_rate_timer)
 
 	reload_timer.wait_time = weapon_data.reload_time
 	reload_timer.one_shot = true
 	reload_timer.timeout.connect(_on_reload_finished)
-	add_child(reload_timer)
 
 	emit_signal("ammo_updated", current_ammo, reserve_ammo)
 
 	if weapon_data.projectile_scene:
+		if projectile_pool:
+			projectile_pool.queue_free()
 		projectile_pool = ProjectilePool.new(weapon_data.projectile_scene)
 		add_child(projectile_pool)
 
+func unload_weapon_data():
+	weapon_data = null
+	set_process(false)
+	set_physics_process(false)
+
+func _unhandled_input(event):
+	if not weapon_data: return
+	if event is InputEventMouseMotion:
+		handle_mouse_motion(event)
+
+func handle_mouse_motion(event: InputEventMouseMotion):
+	var sway_intensity = weapon_data.sway_intensity
+	if is_aiming:
+		sway_intensity *= weapon_data.ads_sway_multiplier
+
+	sway_target.y = clamp(sway_target.y - event.relative.x * sway_intensity, -weapon_data.max_sway_x, weapon_data.max_sway_x)
+	sway_target.x = clamp(sway_target.x - event.relative.y * sway_intensity, -weapon_data.max_sway_y, weapon_data.max_sway_y)
+
+func _physics_process(delta):
+	if not weapon_data: return
+
+	current_sway = lerp(current_sway, sway_target, weapon_data.sway_speed * delta)
+	sway_target = lerp(sway_target, Vector3.ZERO, weapon_data.sway_speed * delta)
+
+	if view_model_component:
+		view_model_component.apply_sway(current_sway)
 
 func handle_input():
+	if not weapon_data: return
 	match current_fire_mode:
 		"semi-auto":
 			if Input.is_action_just_pressed("shoot"):
@@ -62,16 +93,16 @@ func handle_input():
 				attempt_fire()
 	if Input.is_action_just_pressed("reload"):
 		attempt_reload()
-	
+
 	if Input.is_action_just_pressed("switch_fire_mode"):
 		switch_fire_mode()
-		
+
 	if Input.is_action_just_pressed("aim"):
 		is_aiming = true
 	elif Input.is_action_just_released("aim"):
 		is_aiming = false
-		
-	
+
+
 func attempt_fire() -> bool:
 	if current_ammo > 0:
 		if fire_rate_timer.is_stopped():
@@ -102,15 +133,18 @@ func _fire():
 	emit_signal("ammo_updated", current_ammo, reserve_ammo)
 
 	if view_model_component and weapon_data.recoil_data:
-		var recoil_data = weapon_data.recoil_data
 		view_model_component.apply_recoil()
 
+	if view_model_component and view_model_component.weapon_node:
+		var animation_player = view_model_component.weapon_node.get_node("AnimationPlayer")
+		if animation_player and animation_player.has_animation("animation"):
+			animation_player.play("animation")
 
 	# Instantiate and fire projectile
 	if weapon_data.projectile_scene:
 		var projectile_instance = projectile_pool.get_projectile()
 		var projectile_component = projectile_instance.get_node("ProjectileComponent") as ProjectileComponent
-		
+
 		if projectile_component:
 			var owner_entity = get_owner() as Node3D
 			if owner_entity and owner_entity.has_method("get_barrel_node"):
@@ -124,18 +158,14 @@ func _fire():
 					projectile_component.direction = - owner_entity.global_transform.basis.z
 
 				# Add collision exception
-				if projectile_instance is RigidBody3D:
+			if projectile_instance is RigidBody3D:
 					projectile_instance.add_collision_exception_with(owner_entity)
-			
+
 			projectile_component.damage = weapon_data.damage
 			projectile_component.fire()
-			# You can add more properties from WeaponData to the projectile here
-
 
 func _on_reload_finished():
 	var needed_ammo = weapon_data.magazine_size - current_ammo
-	# For now, we'll assume infinite reserve ammo for simplicity
-	# In a full system, you'd check reserve_ammo here
 	current_ammo += needed_ammo
 	emit_signal("weapon_reloaded")
 	emit_signal("ammo_updated", current_ammo, reserve_ammo)

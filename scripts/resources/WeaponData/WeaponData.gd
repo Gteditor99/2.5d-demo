@@ -53,3 +53,10 @@ const RecoilData = preload("res://scripts/resources/RecoilData/RecoilData.gd")
 @export var ads_view_rotation: Vector3 = Vector3.ZERO
 @export var ads_fov: float = 50.0
 @export var ads_transition_speed: float = 15.0
+
+@export_group("Sway")
+@export var sway_speed: float = 5.0
+@export var sway_intensity: float = 0.05
+@export var max_sway_x: float = 2.0
+@export var max_sway_y: float = 2.0
+@export var ads_sway_multiplier: float = 0.5

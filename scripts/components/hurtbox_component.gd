@@ -1,19 +1,13 @@
 class_name HurtboxComponent
-extends RigidBody3D
+extends Area3D
 
+const HealthComponent = preload("res://scripts/components/health_component.gd")
 @export var health_component: HealthComponent
 
 func _ready():
 	if not health_component:
-		var owner_node = get_owner()
-		if owner_node and owner_node.has_node("HealthComponent"):
-			health_component = owner_node.get_node("HealthComponent")
-		else:
-			push_error("HurtboxComponent requires a HealthComponent.")
+		push_error("HurtboxComponent requires a HealthComponent.")
 
-func take_damage(damage_amount: float):
-	Debug.log("HurtboxComponent received take_damage call with amount: %f" % damage_amount)
+func take_damage(damage: int):
 	if health_component:
-		health_component.take_damage(damage_amount)
-	else:
-		push_error("HurtboxComponent is not associated with a HealthComponent.")
+		health_component.take_damage(damage)

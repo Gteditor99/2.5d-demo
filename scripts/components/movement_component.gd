@@ -14,6 +14,9 @@ extends Node
 @export_group("Stair Handling")
 @export var stair_stepping_component: StairSteppingComponent
 
+@export_group("Equipment")
+@export var equipment_component: EquipmentComponent
+
 # PRIVATE VARIABLES
 var _parent_body: CharacterBody3D
 var _input_direction: Vector2 = Vector2.ZERO

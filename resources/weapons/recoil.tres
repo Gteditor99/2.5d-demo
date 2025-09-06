@@ -1,30 +1,10 @@
-[gd_resource type="Resource" script_class="RecoilData" load_steps=8 format=3 uid="uid://cmq88mnr637ym"]
+[gd_resource type="Resource" script_class="RecoilData" load_steps=3 format=3 uid="uid://cmq88mnr637ym"]
 
 [ext_resource type="Script" uid="uid://bvfp2jqfa0lun" path="res://scripts/resources/RecoilData/RecoilData.gd" id="1_g07of"]
 
 [sub_resource type="Curve" id="Curve_pos_x"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
-point_count = 2
-
-[sub_resource type="Curve" id="Curve_pos_y"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
-point_count = 2
-
-[sub_resource type="Curve" id="Curve_pos_z"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
-point_count = 2
-
-[sub_resource type="Curve" id="Curve_rot_x"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
-point_count = 2
-
-[sub_resource type="Curve" id="Curve_rot_y"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
-point_count = 2
-
-[sub_resource type="Curve" id="Curve_rot_z"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
-point_count = 2
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.1, 1), 0.0, 0.0, 0, 0, Vector2(0.2, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 4
 
 [resource]
 script = ExtResource("1_g07of")
@@ -43,9 +23,9 @@ rotational_kick_horizontal = 0.5
 ads_positional_multiplier = 0.285
 ads_rotational_multiplier = 0.245
 positional_recoil_curve_x = SubResource("Curve_pos_x")
-positional_recoil_curve_y = SubResource("Curve_pos_y")
-positional_recoil_curve_z = SubResource("Curve_pos_z")
-rotational_recoil_curve_x = SubResource("Curve_rot_x")
-rotational_recoil_curve_y = SubResource("Curve_rot_y")
-rotational_recoil_curve_z = SubResource("Curve_rot_z")
+positional_recoil_curve_y = SubResource("Curve_pos_x")
+positional_recoil_curve_z = SubResource("Curve_pos_x")
+rotational_recoil_curve_x = SubResource("Curve_pos_x")
+rotational_recoil_curve_y = SubResource("Curve_pos_x")
+rotational_recoil_curve_z = SubResource("Curve_pos_x")
 metadata/_custom_type_script = "uid://bvfp2jqfa0lun"

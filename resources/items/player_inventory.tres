@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="InventoryData" load_steps=4 format=3 uid="uid://dbplc8pixnldw"]
+
+[ext_resource type="Script" uid="uid://dopix31xdrmte" path="res://scripts/resources/ItemData/ItemData.gd" id="1_ejs61"]
+[ext_resource type="Script" uid="uid://bfeyw5mms4kkt" path="res://scripts/resources/Inventory/inventory_data.gd" id="2_s1663"]
+[ext_resource type="Resource" uid="uid://bcatpwtee3qsi" path="res://resources/weapons/type88.tres" id="3_weap"]
+
+[resource]
+script = ExtResource("2_s1663")
+items = Array[ExtResource("1_ejs61")]([ExtResource("3_weap")])
+metadata/_custom_type_script = "uid://bfeyw5mms4kkt"

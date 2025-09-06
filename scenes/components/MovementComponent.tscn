@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://collpnpisosr1"]
-
-[ext_resource type="Script" uid="uid://dtl6r2jl4bco3" path="res://scripts/components/movement_component.gd" id="1_qultv"]
-
-[node name="MovementComponent" type="Node"]
-script = ExtResource("1_qultv")

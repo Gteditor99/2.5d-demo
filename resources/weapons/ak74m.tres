@@ -1,13 +1,15 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=5 format=3 uid="uid://p7xpsvtcwwjy"]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=6 format=3 uid="uid://p7xpsvtcwwjy"]
 
 [ext_resource type="PackedScene" uid="uid://ckotr225fdib7" path="res://assets/models/type88.gltf" id="1_0nnpp"]
 [ext_resource type="Script" uid="uid://ct3jmbc7fmgm1" path="res://scripts/resources/WeaponData/WeaponData.gd" id="1_abcde"]
 [ext_resource type="PackedScene" uid="uid://blguwf5ugythv" path="res://scenes/weapons/bullet.tscn" id="2_f5ubh"]
 [ext_resource type="Resource" uid="uid://cmq88mnr637ym" path="res://resources/weapons/recoil.tres" id="3_70wp4"]
 
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_70wp4"]
+
 [resource]
 script = ExtResource("1_abcde")
-damage = 25
+damage = 100
 rounds_per_minute = 400
 range = 1000.0
 magazine_size = 30
@@ -31,7 +33,13 @@ ads_view_offset = Vector3(0, -0.425, -0.93)
 ads_view_rotation = Vector3(0, 0, 0)
 ads_fov = 50.0
 ads_transition_speed = 15.0
+sway_speed = 10.0
+sway_intensity = 0.1
+max_sway_x = 5.0
+max_sway_y = 5.0
+ads_sway_multiplier = 0.5
 item_name = "AK74M"
 item_description = "AK74M Recoil Data"
+thumbnail = SubResource("PlaceholderTexture2D_70wp4")
 model = ExtResource("1_0nnpp")
 components = Array[Resource]([])

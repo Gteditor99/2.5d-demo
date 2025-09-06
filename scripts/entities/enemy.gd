@@ -6,29 +6,24 @@ extends CharacterBody3D
 
 # --- Components ---
 @onready var movement_component: MovementComponent = $MovementComponent
-@onready var health_component: HealthComponent = $HealthComponent
 @onready var chase_player_behavior: ChasePlayerBehavior = $ChasePlayerBehavior
+@onready var health_component: HealthComponent = $HealthComponent
 
 enum EnemyState {IDLE, CHASE, ATTACK, DEAD}
 var current_state: EnemyState = EnemyState.IDLE
 
-
-func take_damage(amount: int) -> void:
-	health_component.take_damage(amount)
-
-
 func _ready() -> void:
-	# Connect to the health component's died signal
-	health_component.died.connect(_on_death)
-	health_component.health_changed.connect(_on_health_changed)
-	
 	# Initialize state
 	_set_state(EnemyState.CHASE) # Start by chasing for now
+	
+	# Health component signals
+	if health_component:
+		health_component.hurt.connect(_on_hurt)
+		health_component.no_health.connect(func(): _set_state(EnemyState.DEAD))
 
 
 func _physics_process(_delta: float) -> void:
-	if not player or health_component.current_health <= 0:
-		_set_state(EnemyState.DEAD)
+	if not player:
 		return
 		
 	var distance_to_player = global_position.distance_to(player.global_position)
@@ -56,7 +51,8 @@ func _set_state(new_state: EnemyState) -> void:
 	# Exit current state
 	match current_state:
 		EnemyState.CHASE:
-			chase_player_behavior.set_process(false)
+			if chase_player_behavior:
+				chase_player_behavior.set_process(false)
 		EnemyState.ATTACK:
 			# Stop attack animation/timer if any
 			pass
@@ -70,7 +66,8 @@ func _set_state(new_state: EnemyState) -> void:
 	# Enter new state
 	match current_state:
 		EnemyState.CHASE:
-			chase_player_behavior.set_process(true)
+			if chase_player_behavior:
+				chase_player_behavior.set_process(true)
 		EnemyState.ATTACK:
 			# Start attack animation/timer
 			movement_component.set_input_direction(Vector2.ZERO) # Stop moving when attacking
@@ -80,25 +77,22 @@ func _set_state(new_state: EnemyState) -> void:
 			movement_component.set_input_direction(Vector2.ZERO) # Stop moving when idle
 
 
+func _on_hurt() -> void:
+	print("Enemy was hurt.")
+	# TODO: Add hurt animation, sound, and effects.
+	# For example: $AnimatedSprite3D.play("hurt")
+	pass
+
+
 func _on_death() -> void:
 	print("Enemy has died.")
 	# Stop all movement and processing
 	set_physics_process(false)
-	movement_component.set_process(false)
-	chase_player_behavior.set_process(false)
+	if movement_component:
+		movement_component.set_process(false)
+	if chase_player_behavior:
+		chase_player_behavior.set_process(false)
 	
 	# Play death animation and disable collision
 	$AnimatedSprite3D.play("death") # Assuming you have a 'death' animation
 	$CollisionShape3D.disabled = true
-
-func _on_health_changed(new_health: int, max_health: int) -> void:
-	# This function can be used to trigger a "hurt" animation or effect
-	# when the enemy takes damage but is not yet dead.
-	if new_health > 0:
-		# Assuming you have a "hurt" animation.
-		# If you want to show a single frame of an animation, you can do this:
-		# $AnimatedSprite3D.animation = "hurt"
-		# $AnimatedSprite3D.frame = 0 
-		# $AnimatedSprite3D.stop() # Stop it from playing the full animation
-		# If you want to advance the current animation by one frame:
-		$AnimatedSprite3D.frame += 1
