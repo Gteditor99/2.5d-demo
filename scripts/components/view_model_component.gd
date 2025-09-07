@@ -44,7 +44,7 @@ func _ready():
 	# Add to group for easy discovery by debug systems
 	add_to_group("view_model")
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if not weapon_node or not camera:
 		return
 
