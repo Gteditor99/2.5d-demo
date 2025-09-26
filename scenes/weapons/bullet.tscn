@@ -23,7 +23,7 @@ script = ExtResource("1_mx1hr")
 shape = SubResource("SphereShape3D_1t05q")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.0622977, 0, 0, 0, -1.47784e-08, -0.077207, 0, 0.33809, -3.37482e-09, 0, 0, 0)
+transform = Transform3D(0.0622977, 0, 0, 0, 3.9176924e-09, -0.077207, 0, -0.08962626, -3.37482e-09, 0, 0, 0)
 mesh = ExtResource("2_1t05q")
 surface_material_override/0 = SubResource("StandardMaterial3D_y25gk")
 

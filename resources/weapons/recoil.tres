@@ -3,25 +3,24 @@
 [ext_resource type="Script" uid="uid://bvfp2jqfa0lun" path="res://scripts/resources/RecoilData/RecoilData.gd" id="1_g07of"]
 
 [sub_resource type="Curve" id="Curve_pos_x"]
-_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.1, 1), 0.0, 0.0, 0, 0, Vector2(0.2, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.2, 1), 0.0, 0.0, 0, 0, Vector2(0.3, 0.5), 0.0, 0.0, 0, 0, Vector2(1, 0.5), 0.0, 0.0, 0, 0]
 point_count = 4
 
 [resource]
 script = ExtResource("1_g07of")
 randomness = 0.063
-recovery_speed = 1.0
+recovery_speed = 1000.0
 positional_stiffness = 150.0
-positional_damping = 40.0
-rotational_stiffness = 100.0
-rotational_damping = 10.0
+positional_damping = 50.0
+rotational_damping = 60.0
 positional_kick_up = 1.0
 positional_kick_back = 7.0
 positional_kick_horizontal = 0.5
-rotational_kick_up = 1.0
-rotational_kick_back = 1.0
-rotational_kick_horizontal = 0.5
+rotational_kick_up = 5.0
+rotational_kick_back = 0.5
+rotational_kick_horizontal = 1.0
 ads_positional_multiplier = 0.285
-ads_rotational_multiplier = 0.245
+ads_rotational_multiplier = 0.8
 positional_recoil_curve_x = SubResource("Curve_pos_x")
 positional_recoil_curve_y = SubResource("Curve_pos_x")
 positional_recoil_curve_z = SubResource("Curve_pos_x")

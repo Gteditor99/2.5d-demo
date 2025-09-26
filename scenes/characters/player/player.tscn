@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://jnc8p6dkjh3f"]
+[gd_scene load_steps=29 format=3 uid="uid://jnc8p6dkjh3f"]
 
 [ext_resource type="Script" uid="uid://jemxf1emkayb" path="res://scripts/entities/player.gd" id="1_42irl"]
 [ext_resource type="Texture2D" uid="uid://3krm5n4xhutn" path="res://assets/sprites/PNG_0001.png" id="3_tuyoq"]
@@ -14,7 +14,6 @@
 [ext_resource type="Script" uid="uid://c0cwb20uk38iy" path="res://scripts/components/weapon_component.gd" id="11_i1nod"]
 [ext_resource type="Resource" uid="uid://bcatpwtee3qsi" path="res://resources/weapons/type88.tres" id="12_i1nod"]
 [ext_resource type="Resource" uid="uid://clk0a6kbq0qxi" path="res://resources/weapons/glock17.tres" id="12_ro20i"]
-[ext_resource type="Resource" uid="uid://p7xpsvtcwwjy" path="res://resources/weapons/ak74m.tres" id="13_6nfx3"]
 [ext_resource type="Script" uid="uid://d0pclc6p6ru68" path="res://scripts/components/inventory_component.gd" id="13_blysn"]
 [ext_resource type="Resource" uid="uid://dbplc8pixnldw" path="res://resources/items/player_inventory.tres" id="14_i1nod"]
 [ext_resource type="Script" uid="uid://dopix31xdrmte" path="res://scripts/resources/ItemData/ItemData.gd" id="14_ykrpk"]
@@ -72,6 +71,7 @@ animations = [{
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_42irl")
+WASD_TILT_DEGREES = 5.0
 
 [node name="Head" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
@@ -186,7 +186,7 @@ script = ExtResource("10_ykrpk")
 [node name="WeaponSystemComponent" type="Node" parent="." node_paths=PackedStringArray("view_model_component")]
 script = ExtResource("11_i1nod")
 view_model_component = NodePath("../Head/ViewModelComponent")
-weapon_data = ExtResource("13_6nfx3")
+weapon_data = ExtResource("12_ro20i")
 
 [node name="InventoryComponent" type="Node" parent="." node_paths=PackedStringArray("equipment_component")]
 script = ExtResource("13_blysn")

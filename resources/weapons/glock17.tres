@@ -2,46 +2,26 @@
 
 [ext_resource type="PackedScene" uid="uid://cnkp0k7ijt68d" path="res://assets/models/g17.gltf" id="1_nia1q"]
 [ext_resource type="PackedScene" uid="uid://blguwf5ugythv" path="res://scenes/weapons/bullet.tscn" id="2_ormn0"]
-[ext_resource type="Resource" uid="uid://cmq88mnr637ym" path="res://resources/weapons/recoil.tres" id="3_o4wpt"]
+[ext_resource type="Resource" uid="uid://cm0d08omu3pc0" path="res://resources/weapons/pistol_recoil.tres" id="3_nia1q"]
 [ext_resource type="Script" uid="uid://ct3jmbc7fmgm1" path="res://scripts/resources/WeaponData/WeaponData.gd" id="4_7vyvf"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bxwvg"]
 
 [resource]
 script = ExtResource("4_7vyvf")
-damage = 10
-rounds_per_minute = 600
-range = 1000.0
 magazine_size = 17
 reload_time = 1.5
 available_fire_modes = Array[String](["semi-auto"])
 default_fire_mode = "semi-auto"
-burst_count = 3
-spread_angle = 1.0
-recoil_data = ExtResource("3_o4wpt")
+recoil_data = ExtResource("3_nia1q")
 projectile_scene = ExtResource("2_ormn0")
 weapon_scene = ExtResource("1_nia1q")
 idle_view_offset = Vector3(0.085, -0.347, -0.933)
-idle_view_rotation = Vector3(0, 0, 0)
-idle_fov = 75.0
-idle_transition_speed = 10.0
 sprint_view_offset = Vector3(0.085, -0.347, -0.933)
-sprint_view_rotation = Vector3(0, 0, 0)
-sprint_fov = 85.0
-sprint_transition_speed = 8.0
 ads_view_offset = Vector3(0, -0.22, -1.118)
-ads_view_rotation = Vector3(0, 0, 0)
-ads_fov = 50.0
-ads_transition_speed = 15.0
-sway_speed = 5.0
-sway_intensity = 0.05
-max_sway_x = 2.0
-max_sway_y = 2.0
-ads_sway_multiplier = 0.5
 item_name = "Glock 17"
 item_description = "Glock 17
 "
 thumbnail = SubResource("PlaceholderTexture2D_bxwvg")
 model = ExtResource("1_nia1q")
-components = Array[Resource]([])
 metadata/_custom_type_script = "uid://ct3jmbc7fmgm1"

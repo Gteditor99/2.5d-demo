@@ -40,7 +40,7 @@ func _physics_process(delta):
 		
 
 func get_damage() -> int:
-	return damage
+		return damage
 
 func _on_area_entered(area: Area3D):
 	print("Projectile entered area: %s" % area.name)
