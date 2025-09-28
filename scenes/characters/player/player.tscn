@@ -108,7 +108,7 @@ script = ExtResource("9_hv5x3")
 camera = NodePath("../Camera3D")
 
 [node name="blockbench_export2" parent="Head" instance=ExtResource("8_8y75b")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, -1.118)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.22, -0.863)
 visible = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]

@@ -1,98 +1,107 @@
 extends CharacterBody3D
 
-@export var attack_range: float = 2.0
+@export var npc_data: NPCData:
+        set(value):
+                _npc_data = value
+                if is_node_ready():
+                        _apply_npc_data()
+        get:
+                return _npc_data
 
-@onready var player: CharacterBody3D = get_tree().get_first_node_in_group("Player")
-
-# --- Components ---
+@onready var ai_controller: EnemyAIController = $EnemyAIController
 @onready var movement_component: MovementComponent = $MovementComponent
-@onready var chase_player_behavior: ChasePlayerBehavior = $ChasePlayerBehavior
 @onready var health_component: HealthComponent = $HealthComponent
+@onready var animated_sprite: AnimatedSprite3D = $AnimatedSprite3D
+@onready var collision_shape: CollisionShape3D = $CollisionShape3D
 
-enum EnemyState {IDLE, CHASE, ATTACK, DEAD}
-var current_state: EnemyState = EnemyState.IDLE
+var _npc_data: NPCData
+var _active_behavior: EnemyAIBehavior
+
 
 func _ready() -> void:
-	# Initialize state
-	_set_state(EnemyState.CHASE) # Start by chasing for now
-	
-	# Health component signals
-	if health_component:
-		health_component.hurt.connect(_on_hurt)
-		health_component.no_health.connect(func(): _set_state(EnemyState.DEAD))
+        if health_component:
+                health_component.hurt.connect(_on_hurt)
+                health_component.no_health.connect(_on_no_health)
+
+        if ai_controller:
+                ai_controller.state_changed.connect(_on_state_changed)
+                ai_controller.attack_requested.connect(_on_attack_requested)
+
+        _apply_npc_data()
 
 
-func _physics_process(_delta: float) -> void:
-	if not player:
-		return
-		
-	var distance_to_player = global_position.distance_to(player.global_position)
-	if distance_to_player > attack_range:
-		_set_state(EnemyState.CHASE)
+func _apply_npc_data() -> void:
+        if not _npc_data:
+                return
 
-	match current_state:
-		EnemyState.CHASE:
-			if distance_to_player <= attack_range:
-				_set_state(EnemyState.ATTACK)
-		EnemyState.ATTACK:
-			# TODO: Implement attack logic here
-			# For example: $AttackTimer.start()
-			pass
-		EnemyState.IDLE:
-			pass # No specific action in idle state for now
-		EnemyState.DEAD:
-			pass # No action when dead
+        if animated_sprite and _npc_data.sprite_frames:
+                animated_sprite.sprite_frames = _npc_data.sprite_frames
+                var start_animation := _npc_data.get_animation_for_state(EnemyAIController.State.IDLE)
+                _play_animation(start_animation)
+
+        if movement_component:
+                movement_component.SPEED = _npc_data.move_speed
+                movement_component.ACCELERATION = _npc_data.acceleration
+                movement_component.FRICTION = _npc_data.friction
+
+        if health_component:
+                health_component.max_health = _npc_data.max_health
+                health_component.health = _npc_data.max_health
+
+        if ai_controller:
+                _active_behavior = _npc_data.instantiate_behavior()
+                if _active_behavior:
+                        ai_controller.set_behavior(_active_behavior)
 
 
-func _set_state(new_state: EnemyState) -> void:
-	if current_state == new_state:
-		return
+func _on_state_changed(_previous_state: EnemyAIController.State, new_state: EnemyAIController.State) -> void:
+        if not _npc_data:
+                return
 
-	# Exit current state
-	match current_state:
-		EnemyState.CHASE:
-			if chase_player_behavior:
-				chase_player_behavior.set_process(false)
-		EnemyState.ATTACK:
-			# Stop attack animation/timer if any
-			pass
-		EnemyState.DEAD:
-			pass # Already dead, no exit
-		EnemyState.IDLE:
-			pass
+        var animation_name := _npc_data.get_animation_for_state(new_state)
+        _play_animation(animation_name)
 
-	current_state = new_state
 
-	# Enter new state
-	match current_state:
-		EnemyState.CHASE:
-			if chase_player_behavior:
-				chase_player_behavior.set_process(true)
-		EnemyState.ATTACK:
-			# Start attack animation/timer
-			movement_component.set_input_direction(Vector2.ZERO) # Stop moving when attacking
-		EnemyState.DEAD:
-			_on_death()
-		EnemyState.IDLE:
-			movement_component.set_input_direction(Vector2.ZERO) # Stop moving when idle
+func _on_attack_requested() -> void:
+        if _npc_data:
+                print("%s attacks for %d damage." % [str(_npc_data.get_identity_key()), _npc_data.attack_damage])
+        else:
+                print("Enemy attack triggered.")
 
 
 func _on_hurt() -> void:
-	print("Enemy was hurt.")
-	# TODO: Add hurt animation, sound, and effects.
-	# For example: $AnimatedSprite3D.play("hurt")
-	pass
+        if _npc_data:
+                _play_animation(_npc_data.get_hurt_animation())
+                print("%s was hurt." % str(_npc_data.get_identity_key()))
+        else:
+                print("Enemy was hurt.")
 
 
-func _on_death() -> void:
-	print("Enemy has died.")
-	# Stop all movement and processing
-	set_physics_process(false)
-	if movement_component:
-		movement_component.set_process(false)
-	if chase_player_behavior:
-		chase_player_behavior.set_process(false)
-	
-	# Play death animation and disable collision
-	$AnimatedSprite3D.play("death") # Assuming you have a 'death' animation
-	$CollisionShape3D.disabled = true
+func _on_no_health() -> void:
+        print("Enemy has died.")
+        set_physics_process(false)
+
+        if ai_controller:
+                ai_controller.handle_death()
+
+        if movement_component:
+                movement_component.set_physics_process(false)
+
+        if collision_shape:
+                collision_shape.disabled = true
+
+        if _npc_data:
+                _play_animation(_npc_data.get_death_animation())
+        else:
+                _play_animation(&"death")
+
+
+func _play_animation(name: StringName) -> void:
+        if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation(name):
+                animated_sprite.play(name)
+
+
+func _on_animated_sprite_3d_animation_finished() -> void:
+        var death_animation := _npc_data.get_death_animation() if _npc_data else &"death"
+        if animated_sprite.animation == death_animation:
+                queue_free()

@@ -1,75 +1,35 @@
-[gd_scene load_steps=19 format=3 uid="uid://busr2a8v8vr1j"]
+[gd_scene load_steps=12 format=3 uid="uid://busr2a8v8vr1j"]
 
-[ext_resource type="Texture2D" uid="uid://bepalnnwhphiw" path="res://assets/sprites/jy/jy0000.png" id="1_c4w8v"]
 [ext_resource type="Script" uid="uid://cnsmm4hlrw7x2" path="res://scripts/entities/enemy.gd" id="1_ipns3"]
-[ext_resource type="Texture2D" uid="uid://ylng62l1e2tc" path="res://assets/sprites/jy/jy0001.png" id="2_xwavj"]
-[ext_resource type="Texture2D" uid="uid://y7yaus2g5uvw" path="res://assets/sprites/jy/jy0002.png" id="3_nenq2"]
-[ext_resource type="Texture2D" uid="uid://cgn1kmto7s3sb" path="res://assets/sprites/jy/jy0003.png" id="4_md484"]
-[ext_resource type="Texture2D" uid="uid://dmvt51rtauj41" path="res://assets/sprites/jy/jy0004.png" id="5_ipns3"]
-[ext_resource type="Script" uid="uid://d12iscnem4ruh" path="res://scripts/components/health_component.gd" id="7_jmxl0"]
-[ext_resource type="Script" uid="uid://dtl6r2jl4bco3" path="res://scripts/components/movement_component.gd" id="8_60ha2"]
-[ext_resource type="Script" path="res://scripts/components/chase_player_behavior.gd" id="9_j8qac"]
-[ext_resource type="Script" uid="uid://dlffpxied7ulc" path="res://scripts/components/hurtbox_component.gd" id="10_60ha2"]
+[ext_resource type="SpriteFrames" uid="uid://bmp8cbntt5dpi" path="res://resources/npcs/enemies/jy_sprite_frames.tres" id="2_7c0lf"]
+[ext_resource type="Resource" uid="uid://b2vve3wiy0a37" path="res://resources/npcs/enemies/jy_grunt.tres" id="3_yc1gq"]
+[ext_resource type="Script" uid="uid://d12iscnem4ruh" path="res://scripts/components/health_component.gd" id="4_jmxl0"]
+[ext_resource type="Script" uid="uid://dtl6r2jl4bco3" path="res://scripts/components/movement_component.gd" id="5_60ha2"]
+[ext_resource type="Script" uid="uid://cvx2nhan1vf8d" path="res://scripts/components/ai/enemy_ai_controller.gd" id="6_3p7e1"]
+[ext_resource type="Script" uid="uid://dlffpxied7ulc" path="res://scripts/components/hurtbox_component.gd" id="7_60ha2"]
+[ext_resource type="Script" uid="uid://xc70xg6xajro" path="res://scripts/components/ai/chase_attack_ai_behavior.gd" id="8_mxrkf"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_j8qac"]
 size = Vector3(0.974219, 1.6, 0.6)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8qclf"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_w8i8w"]
-atlas = ExtResource("1_c4w8v")
-region = Rect2(0, 0, 2560, 2560)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_otmr2"]
-atlas = ExtResource("2_xwavj")
-region = Rect2(0, 0, 2560, 2560)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_wtq4b"]
-atlas = ExtResource("3_nenq2")
-region = Rect2(0, 0, 2560, 2560)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_j0cyh"]
-atlas = ExtResource("4_md484")
-region = Rect2(0, 0, 2560, 2560)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_g0wcc"]
-atlas = ExtResource("5_ipns3")
-region = Rect2(0, 0, 2560, 2560)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_s1ycm"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_w8i8w")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_otmr2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_wtq4b")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_j0cyh")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_g0wcc")
-}],
-"loop": false,
-"name": &"death",
-"speed": 12.0
-}]
+[sub_resource type="Resource" id="Resource_jmxl0"]
+script = ExtResource("8_mxrkf")
+metadata/_custom_type_script = "uid://xc70xg6xajro"
 
 [node name="Enemy" type="CharacterBody3D"]
 transform = Transform3D(0.995914, 0, 0, 0, 0.995914, 0, 0, 0, 0.995914, 0, 0, 0)
 collision_layer = 2
 script = ExtResource("1_ipns3")
+npc_data = ExtResource("3_yc1gq")
 
 [node name="HurtboxComponent" type="Area3D" parent="." node_paths=PackedStringArray("health_component")]
 transform = Transform3D(1.85, 0, 0, 0, 1, 0, 0, 0, 1.85, 0, 0, 0)
 collision_layer = 2
 collision_mask = 4
 collision_priority = 2.0
-script = ExtResource("10_60ha2")
+script = ExtResource("7_60ha2")
 health_component = NodePath("../HealthComponent")
 metadata/_custom_type_script = "uid://dlffpxied7ulc"
 
@@ -84,21 +44,22 @@ shape = SubResource("CapsuleShape3D_8qclf")
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
 transform = Transform3D(0.095, 0, 0, 0, 0.095, 0, 0, 0, 0.095, -0.0551562, 1.18726, 0)
 billboard = 2
-sprite_frames = SubResource("SpriteFrames_s1ycm")
-animation = &"death"
+sprite_frames = ExtResource("2_7c0lf")
+animation = &"idle"
 
 [node name="HealthComponent" type="Node" parent="."]
-script = ExtResource("7_jmxl0")
+script = ExtResource("4_jmxl0")
 metadata/_custom_type_script = "uid://d12iscnem4ruh"
 
 [node name="MovementComponent" type="Node" parent="."]
-script = ExtResource("8_60ha2")
+script = ExtResource("5_60ha2")
 SPEED = 100.0
 ACCELERATION = 100.0
 FRICTION = 100.0
 metadata/_custom_type_script = "uid://dtl6r2jl4bco3"
 
-[node name="ChasePlayerBehavior" type="Node" parent="."]
-script = ExtResource("9_j8qac")
+[node name="EnemyAIController" type="Node" parent="."]
+script = ExtResource("6_3p7e1")
+behavior = SubResource("Resource_jmxl0")
 
 [connection signal="animation_finished" from="AnimatedSprite3D" to="." method="_on_animated_sprite_3d_animation_finished"]

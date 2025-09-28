@@ -2,13 +2,10 @@
 class_name WeaponData
 extends ItemData
 
-const RecoilData = preload("res://scripts/resources/RecoilData/RecoilData.gd")
-
-
 ## WEAPON STATS
 @export_group("Weapon Stats")
-@export var damage: int = 10
 @export var rounds_per_minute: int = 600
+@warning_ignore("shadowed_global_identifier")
 @export var range: float = 1000.0
 
 ## MAGAZINE
