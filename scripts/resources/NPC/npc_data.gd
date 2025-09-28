@@ -35,66 +35,66 @@ const EnemyAIController = preload("res://scripts/components/ai/enemy_ai_controll
 
 
 func get_identity_key() -> StringName:
-        if npc_type == StringName():
-                return variant
-        return StringName("%s:%s" % [npc_type, variant])
+		if npc_type == StringName():
+				return variant
+		return StringName("%s:%s" % [npc_type, variant])
 
 
 func get_animation_for_state(state: EnemyAIController.State) -> StringName:
-        match state:
-                EnemyAIController.State.IDLE:
-                        return _resolve_animation(idle_animation)
-                EnemyAIController.State.CHASE:
-                        return _resolve_animation(chase_animation)
-                EnemyAIController.State.ATTACK:
-                        return _resolve_animation(attack_animation)
-                EnemyAIController.State.DEAD:
-                        return _resolve_animation(dead_animation)
-                _:
-                        return _resolve_animation(default_animation)
+		match state:
+				EnemyAIController.State.IDLE:
+						return _resolve_animation(idle_animation)
+				EnemyAIController.State.CHASE:
+						return _resolve_animation(chase_animation)
+				EnemyAIController.State.ATTACK:
+						return _resolve_animation(attack_animation)
+				EnemyAIController.State.DEAD:
+						return _resolve_animation(dead_animation)
+				_:
+						return _resolve_animation(default_animation)
 
 
 func get_hurt_animation() -> StringName:
-        return _resolve_animation(hurt_animation)
+		return _resolve_animation(hurt_animation)
 
 
 func get_death_animation() -> StringName:
-        return _resolve_animation(dead_animation)
+		return _resolve_animation(dead_animation)
 
 
 func instantiate_behavior() -> EnemyAIBehavior:
-        if not ai_behavior:
-                return null
+		if not ai_behavior:
+				return null
 
-        var behavior_instance: EnemyAIBehavior = ai_behavior.duplicate(true)
-        _apply_behavior_overrides(behavior_instance)
-        return behavior_instance
+		var behavior_instance: EnemyAIBehavior = ai_behavior.duplicate(true)
+		_apply_behavior_overrides(behavior_instance)
+		return behavior_instance
 
 
 func has_animation(animation_name: StringName) -> bool:
-        return sprite_frames and sprite_frames.has_animation(animation_name)
+		return sprite_frames and sprite_frames.has_animation(animation_name)
 
 
 func _resolve_animation(animation_name: StringName) -> StringName:
-        if sprite_frames and sprite_frames.has_animation(animation_name):
-                return animation_name
-        if sprite_frames and sprite_frames.has_animation(default_animation):
-                return default_animation
-        return animation_name
+		if sprite_frames and sprite_frames.has_animation(animation_name):
+				return animation_name
+		if sprite_frames and sprite_frames.has_animation(default_animation):
+				return default_animation
+		return animation_name
 
 
 func _apply_behavior_overrides(behavior_instance: EnemyAIBehavior) -> void:
-        if not behavior_instance or behavior_overrides.is_empty():
-                return
+		if not behavior_instance or behavior_overrides.is_empty():
+				return
 
-        for property_name in behavior_overrides.keys():
-                var property_key := property_name if typeof(property_name) == TYPE_STRING_NAME else StringName(property_name)
-                if _has_property(behavior_instance, property_key):
-                        behavior_instance.set(property_key, behavior_overrides[property_name])
+		for property_name in behavior_overrides.keys():
+				var property_key: StringName = StringName(property_name)
+				if _has_property(behavior_instance, property_key):
+						behavior_instance.set(property_key, behavior_overrides[property_name])
 
 
 func _has_property(target: Object, property_name: StringName) -> bool:
-        for property_info in target.get_property_list():
-                if property_info.name == property_name:
-                        return true
-        return false
+		for property_info in target.get_property_list():
+				if property_info.name == property_name:
+						return true
+		return false

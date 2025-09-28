@@ -9,6 +9,7 @@
 
 [resource]
 script = ExtResource("4_7vyvf")
+damage = 100
 magazine_size = 17
 reload_time = 1.5
 available_fire_modes = Array[String](["semi-auto"])
@@ -18,7 +19,7 @@ projectile_scene = ExtResource("2_ormn0")
 weapon_scene = ExtResource("1_nia1q")
 idle_view_offset = Vector3(0.085, -0.347, -0.933)
 sprint_view_offset = Vector3(0.085, -0.347, -0.933)
-ads_view_offset = Vector3(0, -0.22, -1.118)
+ads_view_offset = Vector3(0, -0.22, -0.863)
 item_name = "Glock 17"
 item_description = "Glock 17
 "

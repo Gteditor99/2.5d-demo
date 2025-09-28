@@ -31,5 +31,4 @@ surface_material_override/0 = SubResource("StandardMaterial3D_y25gk")
 script = ExtResource("3_1t05q")
 Bullet = NodePath("..")
 speed = 200.0
-damage = 100
 metadata/_custom_type_script = "uid://fq1aet8o3h8j"

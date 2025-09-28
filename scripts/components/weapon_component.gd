@@ -1,7 +1,6 @@
 class_name WeaponSystemComponent
 extends Node
 
-const ProjectilePool = preload("res://scripts/components/projectile_pool.gd")
 const RecoilDebugMenu = preload("res://scenes/ui/recoil_debug/recoil_debug_menu.tscn")
 
 signal ammo_updated(current_ammo, reserve_ammo)
@@ -151,17 +150,22 @@ func _fire():
 				var barrel_node = owner_entity.get_barrel_node()
 				if barrel_node:
 					projectile_instance.global_transform = barrel_node.global_transform
-					projectile_component.direction = - barrel_node.global_transform.basis.z
+					projectile_component.direction = - barrel_node.global_transform.basis.z.normalized()
 				else:
 					# Fallback to owner's transform if barrel_node is not found
 					projectile_instance.global_transform = owner_entity.global_transform
-					projectile_component.direction = - owner_entity.global_transform.basis.z
+					projectile_component.direction = - owner_entity.global_transform.basis.z.normalized()
+			elif owner_entity:
+				projectile_instance.global_transform = owner_entity.global_transform
+				projectile_component.direction = - owner_entity.global_transform.basis.z.normalized()
 
-				# Add collision exception
+			if owner_entity is CollisionObject3D:
+				projectile_component.set_owner_to_ignore(owner_entity)
+
+			# Add collision exception
 			if projectile_instance is RigidBody3D:
-					projectile_instance.add_collision_exception_with(owner_entity)
+				projectile_instance.add_collision_exception_with(owner_entity)
 
-			projectile_component.damage = weapon_data.damage
 			projectile_component.fire()
 
 func _on_reload_finished():

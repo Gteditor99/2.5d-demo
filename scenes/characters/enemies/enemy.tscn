@@ -1,17 +1,22 @@
-[gd_scene load_steps=10 format=3 uid="uid://busr2a8v8vr1j"]
+[gd_scene load_steps=12 format=3 uid="uid://busr2a8v8vr1j"]
 
 [ext_resource type="Script" uid="uid://cnsmm4hlrw7x2" path="res://scripts/entities/enemy.gd" id="1_ipns3"]
-[ext_resource type="SpriteFrames" path="res://resources/npcs/enemies/jy_sprite_frames.tres" id="2_7c0lf"]
-[ext_resource type="Resource" path="res://resources/npcs/enemies/jy_grunt.tres" id="3_yc1gq"]
+[ext_resource type="SpriteFrames" uid="uid://bmp8cbntt5dpi" path="res://resources/npcs/enemies/jy_sprite_frames.tres" id="2_7c0lf"]
+[ext_resource type="Resource" uid="uid://b2vve3wiy0a37" path="res://resources/npcs/enemies/jy_grunt.tres" id="3_yc1gq"]
 [ext_resource type="Script" uid="uid://d12iscnem4ruh" path="res://scripts/components/health_component.gd" id="4_jmxl0"]
 [ext_resource type="Script" uid="uid://dtl6r2jl4bco3" path="res://scripts/components/movement_component.gd" id="5_60ha2"]
-[ext_resource type="Script" path="res://scripts/components/ai/enemy_ai_controller.gd" id="6_3p7e1"]
+[ext_resource type="Script" uid="uid://cvx2nhan1vf8d" path="res://scripts/components/ai/enemy_ai_controller.gd" id="6_3p7e1"]
 [ext_resource type="Script" uid="uid://dlffpxied7ulc" path="res://scripts/components/hurtbox_component.gd" id="7_60ha2"]
+[ext_resource type="Script" uid="uid://xc70xg6xajro" path="res://scripts/components/ai/chase_attack_ai_behavior.gd" id="8_mxrkf"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_j8qac"]
 size = Vector3(0.974219, 1.6, 0.6)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8qclf"]
+
+[sub_resource type="Resource" id="Resource_jmxl0"]
+script = ExtResource("8_mxrkf")
+metadata/_custom_type_script = "uid://xc70xg6xajro"
 
 [node name="Enemy" type="CharacterBody3D"]
 transform = Transform3D(0.995914, 0, 0, 0, 0.995914, 0, 0, 0, 0.995914, 0, 0, 0)
@@ -55,5 +60,6 @@ metadata/_custom_type_script = "uid://dtl6r2jl4bco3"
 
 [node name="EnemyAIController" type="Node" parent="."]
 script = ExtResource("6_3p7e1")
+behavior = SubResource("Resource_jmxl0")
 
 [connection signal="animation_finished" from="AnimatedSprite3D" to="." method="_on_animated_sprite_3d_animation_finished"]

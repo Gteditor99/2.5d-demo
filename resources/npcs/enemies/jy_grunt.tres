@@ -1,31 +1,27 @@
-[gd_resource type="Resource" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="NPCData" load_steps=5 format=3 uid="uid://b2vve3wiy0a37"]
 
-[ext_resource type="Script" path="res://scripts/resources/NPC/npc_data.gd" id="1_2mvhf"]
-[ext_resource type="SpriteFrames" path="res://resources/npcs/enemies/jy_sprite_frames.tres" id="2_2mvhf"]
-[ext_resource type="Resource" path="res://resources/ai/chase_attack_ai_behavior.tres" id="3_2mvhf"]
+[ext_resource type="Script" uid="uid://dgxfo51y20yi2" path="res://scripts/resources/NPC/npc_data.gd" id="1_2mvhf"]
+[ext_resource type="Script" uid="uid://xc70xg6xajro" path="res://scripts/components/ai/chase_attack_ai_behavior.gd" id="1_tyerg"]
+[ext_resource type="SpriteFrames" uid="uid://bmp8cbntt5dpi" path="res://resources/npcs/enemies/jy_sprite_frames.tres" id="2_2mvhf"]
+
+[sub_resource type="Resource" id="Resource_47sg8"]
+script = ExtResource("1_tyerg")
+metadata/_custom_type_script = "uid://xc70xg6xajro"
 
 [resource]
 script = ExtResource("1_2mvhf")
 npc_type = &"jy_bandit"
 variant = &"grunt"
 sprite_frames = ExtResource("2_2mvhf")
-default_animation = &"idle"
-idle_animation = &"idle"
-chase_animation = &"walk"
-attack_animation = &"attack"
-hurt_animation = &"hurt"
-dead_animation = &"death"
-max_health = 90
-move_speed = 95.0
+move_speed = 10.0
 acceleration = 90.0
-friction = 100.0
 attack_damage = 12
 experience_reward = 10
-ai_behavior = ExtResource("3_2mvhf")
+ai_behavior = SubResource("Resource_47sg8")
 behavior_overrides = {
 "attack_cooldown": 1.2,
 "detection_range": 12.0,
 "disengage_range": 18.0
 }
 loot_table_id = &"bandit_common"
-tags = [&"humanoid", &"bandit"]
+tags = Array[StringName]([&"humanoid", &"bandit"])
