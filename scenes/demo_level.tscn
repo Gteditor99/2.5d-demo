@@ -1,34 +1,56 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="PackedScene" uid="uid://jnc8p6dkjh3f" path="res://scenes/characters/player/player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="2_gm"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/tutorial/tutorial.tscn" id="4_tut"]
 
-[sub_resource type="StandardMaterial3D" id="floor_mat"]
-albedo_color = Color(0.25, 0.25, 0.28, 1)
-roughness = 0.9
+; --- Materials ---
+[sub_resource type="StandardMaterial3D" id="floor_concrete"]
+albedo_color = Color(0.22, 0.21, 0.24, 1)
+roughness = 0.92
+uv1_scale = Vector3(4, 4, 4)
 
-[sub_resource type="StandardMaterial3D" id="wall_mat"]
-albedo_color = Color(0.35, 0.32, 0.30, 1)
+[sub_resource type="StandardMaterial3D" id="floor_metal"]
+albedo_color = Color(0.28, 0.30, 0.32, 1)
+metallic = 0.3
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="wall_exterior"]
+albedo_color = Color(0.32, 0.30, 0.28, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="wall_interior"]
+albedo_color = Color(0.25, 0.24, 0.26, 1)
 roughness = 0.85
 
-[sub_resource type="StandardMaterial3D" id="accent_mat"]
-albedo_color = Color(0.45, 0.15, 0.12, 1)
+[sub_resource type="StandardMaterial3D" id="wall_accent"]
+albedo_color = Color(0.45, 0.18, 0.12, 1)
 roughness = 0.7
 
 [sub_resource type="StandardMaterial3D" id="pillar_mat"]
-albedo_color = Color(0.30, 0.30, 0.32, 1)
-roughness = 0.8
-
-[sub_resource type="StandardMaterial3D" id="crate_mat"]
-albedo_color = Color(0.4, 0.35, 0.25, 1)
+albedo_color = Color(0.28, 0.28, 0.30, 1)
 roughness = 0.75
 
+[sub_resource type="StandardMaterial3D" id="crate_mat"]
+albedo_color = Color(0.38, 0.33, 0.22, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="platform_mat"]
+albedo_color = Color(0.20, 0.22, 0.28, 1)
+metallic = 0.15
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="catwalk_mat"]
+albedo_color = Color(0.30, 0.28, 0.25, 1)
+metallic = 0.4
+roughness = 0.5
+
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
-sky_top_color = Color(0.05, 0.05, 0.12, 1)
-sky_horizon_color = Color(0.15, 0.12, 0.18, 1)
-ground_bottom_color = Color(0.05, 0.05, 0.05, 1)
-ground_horizon_color = Color(0.1, 0.08, 0.12, 1)
+sky_top_color = Color(0.03, 0.03, 0.08, 1)
+sky_horizon_color = Color(0.10, 0.08, 0.14, 1)
+ground_bottom_color = Color(0.03, 0.03, 0.03, 1)
+ground_horizon_color = Color(0.08, 0.06, 0.10, 1)
 
 [sub_resource type="Sky" id="sky"]
 sky_material = SubResource("sky_mat")
@@ -37,183 +59,446 @@ sky_material = SubResource("sky_mat")
 background_mode = 2
 sky = SubResource("sky")
 ambient_light_source = 2
-ambient_light_color = Color(0.15, 0.12, 0.18, 1)
-ambient_light_energy = 0.3
+ambient_light_color = Color(0.12, 0.10, 0.15, 1)
+ambient_light_energy = 0.25
 tonemap_mode = 2
+tonemap_white = 6.0
 ssao_enabled = true
+ssao_radius = 2.0
+ssao_intensity = 1.5
+ssil_enabled = true
 glow_enabled = true
-glow_intensity = 0.3
+glow_intensity = 0.25
+glow_bloom = 0.05
 fog_enabled = true
-fog_light_color = Color(0.12, 0.1, 0.15, 1)
-fog_density = 0.005
+fog_light_color = Color(0.10, 0.08, 0.12, 1)
+fog_density = 0.003
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.02
+volumetric_fog_albedo = Color(0.12, 0.10, 0.15, 1)
 
+; ======================== ROOT ========================
 [node name="DemoLevel" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("env")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 20, 0)
-light_color = Color(0.85, 0.8, 0.95, 1)
-light_energy = 0.6
+; ======================== LIGHTING ========================
+[node name="MoonLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 25, 0)
+light_color = Color(0.65, 0.7, 0.9, 1)
+light_energy = 0.4
 shadow_enabled = true
-directional_shadow_max_distance = 60.0
+directional_shadow_max_distance = 80.0
 
-[node name="Floor" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-use_collision = true
-size = Vector3(50, 1, 50)
-material = SubResource("floor_mat")
+; --- Central Hall lights ---
+[node name="CentralLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+light_color = Color(0.95, 0.9, 0.8, 1)
+light_energy = 2.5
+omni_range = 18.0
+omni_attenuation = 1.2
+shadow_enabled = true
 
-[node name="WallNorth" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -25)
-use_collision = true
-size = Vector3(50, 5, 1)
-material = SubResource("wall_mat")
+[node name="CentralLight2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, -8)
+light_color = Color(0.9, 0.85, 0.7, 1)
+light_energy = 1.5
+omni_range = 12.0
+omni_attenuation = 1.3
 
-[node name="WallSouth" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 25)
-use_collision = true
-size = Vector3(50, 5, 1)
-material = SubResource("wall_mat")
-
-[node name="WallEast" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 2, 0)
-use_collision = true
-size = Vector3(1, 5, 50)
-material = SubResource("wall_mat")
-
-[node name="WallWest" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, 2, 0)
-use_collision = true
-size = Vector3(1, 5, 50)
-material = SubResource("wall_mat")
-
-[node name="Pillar1" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.5, 8)
-use_collision = true
-size = Vector3(2, 4, 2)
-material = SubResource("pillar_mat")
-
-[node name="Pillar2" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.5, 8)
-use_collision = true
-size = Vector3(2, 4, 2)
-material = SubResource("pillar_mat")
-
-[node name="Pillar3" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.5, -8)
-use_collision = true
-size = Vector3(2, 4, 2)
-material = SubResource("pillar_mat")
-
-[node name="Pillar4" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.5, -8)
-use_collision = true
-size = Vector3(2, 4, 2)
-material = SubResource("pillar_mat")
-
-[node name="CoverCrate1" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.5, 0)
-use_collision = true
-size = Vector3(2, 1.2, 3)
-material = SubResource("crate_mat")
-
-[node name="CoverCrate2" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.5, -3)
-use_collision = true
-size = Vector3(3, 1.2, 2)
-material = SubResource("crate_mat")
-
-[node name="CoverCrate3" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 12)
-use_collision = true
-size = Vector3(4, 1.2, 1.5)
-material = SubResource("crate_mat")
-
-[node name="CoverCrate4" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.5, 5)
-use_collision = true
-size = Vector3(1.5, 1.2, 4)
-material = SubResource("crate_mat")
-
-[node name="CoverCrate5" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.5, -5)
-use_collision = true
-size = Vector3(1.5, 1.2, 4)
-material = SubResource("crate_mat")
-
-[node name="PlatformRaised" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, -15)
-use_collision = true
-size = Vector3(8, 0.6, 6)
-material = SubResource("accent_mat")
-
-[node name="WallPartition1" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1, 0)
-use_collision = true
-size = Vector3(0.3, 3, 8)
-material = SubResource("wall_mat")
-
-[node name="WallPartition2" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 1, 0)
-use_collision = true
-size = Vector3(0.3, 3, 8)
-material = SubResource("wall_mat")
-
-[node name="AreaLight1" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
-light_color = Color(0.9, 0.85, 1.0, 1)
+; --- West Wing (warm industrial) ---
+[node name="WestLight1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 3.5, 0)
+light_color = Color(1.0, 0.65, 0.3, 1)
 light_energy = 2.0
-omni_range = 20.0
-omni_attenuation = 1.5
+omni_range = 14.0
+omni_attenuation = 1.3
+shadow_enabled = true
 
-[node name="AreaLight2" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 3, 10)
-light_color = Color(1.0, 0.6, 0.3, 1)
+[node name="WestLight2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 3.5, 12)
+light_color = Color(0.95, 0.55, 0.25, 1)
 light_energy = 1.5
-omni_range = 15.0
-omni_attenuation = 1.5
+omni_range = 10.0
+omni_attenuation = 1.4
 
-[node name="AreaLight3" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3, -10)
+; --- East Wing (cool tech) ---
+[node name="EastLight1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 3.5, 0)
 light_color = Color(0.3, 0.6, 1.0, 1)
-light_energy = 1.5
-omni_range = 15.0
-omni_attenuation = 1.5
+light_energy = 2.0
+omni_range = 14.0
+omni_attenuation = 1.3
+shadow_enabled = true
 
-[node name="AreaLight4" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -15)
-light_color = Color(0.8, 0.3, 0.3, 1)
-light_energy = 1.2
+[node name="EastLight2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 3.5, -12)
+light_color = Color(0.25, 0.5, 0.9, 1)
+light_energy = 1.5
+omni_range = 10.0
+omni_attenuation = 1.4
+
+; --- South corridor (red alert) ---
+[node name="SouthLight1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 20)
+light_color = Color(0.9, 0.2, 0.15, 1)
+light_energy = 1.8
 omni_range = 12.0
 omni_attenuation = 1.5
 
+; --- North elevated area ---
+[node name="NorthLight1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -22)
+light_color = Color(0.6, 0.9, 0.5, 1)
+light_energy = 1.5
+omni_range = 14.0
+omni_attenuation = 1.3
+
+; --- Catwalks ---
+[node name="CatwalkLight1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 5, -15)
+light_color = Color(0.8, 0.75, 0.6, 1)
+light_energy = 1.0
+omni_range = 8.0
+
+[node name="CatwalkLight2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 5, -15)
+light_color = Color(0.8, 0.75, 0.6, 1)
+light_energy = 1.0
+omni_range = 8.0
+
+; ======================== GROUND FLOOR ========================
+; --- Main floor ---
+[node name="FloorMain" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(60, 1, 60)
+material = SubResource("floor_concrete")
+
+; ======================== EXTERIOR WALLS ========================
+[node name="WallN" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -30)
+use_collision = true
+size = Vector3(60, 7, 1)
+material = SubResource("wall_exterior")
+
+[node name="WallS" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 30)
+use_collision = true
+size = Vector3(60, 7, 1)
+material = SubResource("wall_exterior")
+
+[node name="WallE" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, 0)
+use_collision = true
+size = Vector3(1, 7, 60)
+material = SubResource("wall_exterior")
+
+[node name="WallW" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 3, 0)
+use_collision = true
+size = Vector3(1, 7, 60)
+material = SubResource("wall_exterior")
+
+; ======================== CENTRAL HALL ========================
+; Four structural pillars defining the central area
+[node name="PillarNE" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.5, -6)
+use_collision = true
+size = Vector3(1.5, 6, 1.5)
+material = SubResource("pillar_mat")
+
+[node name="PillarNW" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.5, -6)
+use_collision = true
+size = Vector3(1.5, 6, 1.5)
+material = SubResource("pillar_mat")
+
+[node name="PillarSE" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.5, 6)
+use_collision = true
+size = Vector3(1.5, 6, 1.5)
+material = SubResource("pillar_mat")
+
+[node name="PillarSW" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.5, 6)
+use_collision = true
+size = Vector3(1.5, 6, 1.5)
+material = SubResource("pillar_mat")
+
+; --- Central cover objects ---
+[node name="CentralCrate1" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.5, -2)
+use_collision = true
+size = Vector3(2, 1.2, 1.5)
+material = SubResource("crate_mat")
+
+[node name="CentralCrate2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.5, 3)
+use_collision = true
+size = Vector3(1.5, 1.2, 2)
+material = SubResource("crate_mat")
+
+[node name="CentralBarricade" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+use_collision = true
+size = Vector3(4, 1.5, 0.4)
+material = SubResource("wall_accent")
+
+; ======================== WEST WING (Industrial / Warehouse) ========================
+; Dividing wall with doorway
+[node name="WestDividerN" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, -8)
+use_collision = true
+size = Vector3(0.5, 6, 14)
+material = SubResource("wall_interior")
+
+[node name="WestDividerS" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.5, 10)
+use_collision = true
+size = Vector3(0.5, 6, 10)
+material = SubResource("wall_interior")
+
+; Lintel above west doorway
+[node name="WestDoorLintel" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 4.5, 2)
+use_collision = true
+size = Vector3(0.5, 2, 6)
+material = SubResource("wall_interior")
+
+; West room crates and shelving
+[node name="WestCrate1" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.6, -4)
+use_collision = true
+size = Vector3(2.5, 1.4, 2)
+material = SubResource("crate_mat")
+
+[node name="WestCrate2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0.6, 6)
+use_collision = true
+size = Vector3(2, 1.4, 2.5)
+material = SubResource("crate_mat")
+
+[node name="WestCrateStack" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 1.7, -4)
+use_collision = true
+size = Vector3(1.8, 0.8, 1.5)
+material = SubResource("crate_mat")
+
+[node name="WestShelf" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 1.5, 0)
+use_collision = true
+size = Vector3(0.6, 3.5, 10)
+material = SubResource("pillar_mat")
+
+[node name="WestPillar1" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 2.5, -12)
+use_collision = true
+size = Vector3(1.2, 6, 1.2)
+material = SubResource("pillar_mat")
+
+[node name="WestPillar2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 2.5, 12)
+use_collision = true
+size = Vector3(1.2, 6, 1.2)
+material = SubResource("pillar_mat")
+
+; ======================== EAST WING (Tech Lab) ========================
+; Dividing wall with doorway
+[node name="EastDividerN" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.5, -10)
+use_collision = true
+size = Vector3(0.5, 6, 10)
+material = SubResource("wall_interior")
+
+[node name="EastDividerS" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.5, 8)
+use_collision = true
+size = Vector3(0.5, 6, 14)
+material = SubResource("wall_interior")
+
+; Lintel above east doorway
+[node name="EastDoorLintel" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4.5, -2)
+use_collision = true
+size = Vector3(0.5, 2, 6)
+material = SubResource("wall_interior")
+
+; East room equipment
+[node name="EastDesk1" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, -6)
+use_collision = true
+size = Vector3(4, 1.0, 1.5)
+material = SubResource("platform_mat")
+
+[node name="EastDesk2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 4)
+use_collision = true
+size = Vector3(4, 1.0, 1.5)
+material = SubResource("platform_mat")
+
+[node name="EastServerRack" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 1.5, 0)
+use_collision = true
+size = Vector3(0.8, 3.5, 8)
+material = SubResource("pillar_mat")
+
+[node name="EastCover1" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0.55, 0)
+use_collision = true
+size = Vector3(1.5, 1.3, 3)
+material = SubResource("crate_mat")
+
+; ======================== NORTH ELEVATED PLATFORM ========================
+; Raised platform with ramp access
+[node name="NorthPlatform" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, -22)
+use_collision = true
+size = Vector3(16, 1.5, 10)
+material = SubResource("platform_mat")
+
+; Metal floor on top of platform
+[node name="NorthPlatformFloor" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, -22)
+use_collision = true
+size = Vector3(15.5, 0.1, 9.5)
+material = SubResource("floor_metal")
+
+; Ramp up to platform (west side)
+[node name="NorthRampW" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.949, -0.316, 0, 0.316, 0.949, -10, 0.6, -20)
+use_collision = true
+size = Vector3(3, 0.3, 6)
+material = SubResource("catwalk_mat")
+
+; Ramp up to platform (east side)
+[node name="NorthRampE" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.949, -0.316, 0, 0.316, 0.949, 10, 0.6, -20)
+use_collision = true
+size = Vector3(3, 0.3, 6)
+material = SubResource("catwalk_mat")
+
+; Platform guardrails
+[node name="NorthRailFront" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -17)
+use_collision = true
+size = Vector3(12, 1.5, 0.15)
+material = SubResource("catwalk_mat")
+
+; Platform cover
+[node name="NorthPlatformCrate" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2.1, -22)
+use_collision = true
+size = Vector3(2, 1.2, 1.5)
+material = SubResource("crate_mat")
+
+[node name="NorthPlatformCrate2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.1, -24)
+use_collision = true
+size = Vector3(1.5, 1.2, 2)
+material = SubResource("crate_mat")
+
+; ======================== SOUTH CORRIDOR ========================
+; Narrow corridor with side rooms
+[node name="SouthCorridorWallW" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2, 20)
+use_collision = true
+size = Vector3(0.5, 5, 14)
+material = SubResource("wall_interior")
+
+[node name="SouthCorridorWallE" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 20)
+use_collision = true
+size = Vector3(0.5, 5, 14)
+material = SubResource("wall_interior")
+
+; Corridor cover
+[node name="SouthCrate1" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 16)
+use_collision = true
+size = Vector3(2, 1.2, 1.5)
+material = SubResource("crate_mat")
+
+[node name="SouthCrate2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.5, 22)
+use_collision = true
+size = Vector3(1.5, 1.2, 2)
+material = SubResource("crate_mat")
+
+; ======================== SCATTERED COVER (open areas) ========================
+[node name="MidCoverA" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.6, 14)
+use_collision = true
+size = Vector3(2.5, 1.4, 1.5)
+material = SubResource("crate_mat")
+
+[node name="MidCoverB" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.6, 12)
+use_collision = true
+size = Vector3(1.5, 1.4, 3)
+material = SubResource("crate_mat")
+
+[node name="MidCoverC" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.5, -12)
+use_collision = true
+size = Vector3(3, 1.2, 1)
+material = SubResource("wall_accent")
+
+[node name="MidCoverD" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.5, -10)
+use_collision = true
+size = Vector3(1, 1.2, 3)
+material = SubResource("wall_accent")
+
+; ======================== PLAYER ========================
 [node name="Player" parent="." instance=ExtResource("1_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
 [node name="HUD" parent="Player" instance=ExtResource("3_hud")]
 
-[node name="SpawnPoint1" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, 20)
+; ======================== TUTORIAL ========================
+[node name="Tutorial" parent="." instance=ExtResource("4_tut")]
 
-[node name="SpawnPoint2" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, 20)
+; ======================== SPAWN POINTS ========================
+; West wing spawns
+[node name="SpawnW1" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0.5, -8)
 
-[node name="SpawnPoint3" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0.5, -20)
+[node name="SpawnW2" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0.5, 10)
 
-[node name="SpawnPoint4" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0.5, -20)
+; East wing spawns
+[node name="SpawnE1" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0.5, -8)
 
-[node name="SpawnPoint5" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 22)
+[node name="SpawnE2" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0.5, 10)
 
-[node name="SpawnPoint6" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -22)
+; South corridor spawns
+[node name="SpawnS1" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 26)
 
+[node name="SpawnS2" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.5, 24)
+
+; North platform spawns
+[node name="SpawnN1" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.0, -22)
+
+[node name="SpawnN2" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.0, -22)
+
+; Corner spawns
+[node name="SpawnCorner1" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 0.5, -26)
+
+[node name="SpawnCorner2" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 0.5, 26)
+
+; ======================== GAME MANAGER ========================
 [node name="GameManager" type="Node" parent="." node_paths=PackedStringArray("player", "hud", "spawn_points")]
 script = ExtResource("2_gm")
-spawn_points = [NodePath("../SpawnPoint1"), NodePath("../SpawnPoint2"), NodePath("../SpawnPoint3"), NodePath("../SpawnPoint4"), NodePath("../SpawnPoint5"), NodePath("../SpawnPoint6")]
+spawn_points = [NodePath("../SpawnW1"), NodePath("../SpawnW2"), NodePath("../SpawnE1"), NodePath("../SpawnE2"), NodePath("../SpawnS1"), NodePath("../SpawnS2"), NodePath("../SpawnN1"), NodePath("../SpawnN2"), NodePath("../SpawnCorner1"), NodePath("../SpawnCorner2")]
 player = NodePath("../Player")
 hud = NodePath("../Player/HUD")

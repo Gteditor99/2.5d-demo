@@ -121,6 +121,8 @@ func _ready() -> void:
 	# Connect weapon system to HUD
 	if weapon_system_component:
 		weapon_system_component.ammo_updated.connect(_on_ammo_updated)
+		weapon_system_component.weapon_reload_started.connect(_on_reload_started)
+		weapon_system_component.weapon_reloaded.connect(_on_reload_finished)
 
 	# Equip starting item if available
 	var items = inventory_component.get_items()
@@ -327,6 +329,16 @@ func _update_hud_ammo() -> void:
 		var hud_node = get_node_or_null("HUD")
 		if hud_node and hud_node.has_method("update_ammo"):
 			hud_node.update_ammo(weapon_system_component.current_ammo, weapon_system_component.reserve_ammo)
+
+func _on_reload_started() -> void:
+	var hud_node = get_node_or_null("HUD")
+	if hud_node and hud_node.has_method("show_reload") and weapon_system_component and weapon_system_component.weapon_data:
+		hud_node.show_reload(weapon_system_component.weapon_data.reload_time)
+
+func _on_reload_finished() -> void:
+	var hud_node = get_node_or_null("HUD")
+	if hud_node and hud_node.has_method("hide_reload"):
+		hud_node.hide_reload()
 #endregion
 
 #-----------------------------------------------------------------------------

@@ -1,0 +1,75 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/tutorial/tutorial_system.gd" id="1_tut"]
+
+[sub_resource type="StyleBoxFlat" id="panel_style"]
+bg_color = Color(0.05, 0.05, 0.08, 0.75)
+border_width_left = 2
+border_width_top = 0
+border_width_right = 0
+border_width_bottom = 0
+border_color = Color(0.85, 0.7, 0.3, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 24.0
+content_margin_top = 16.0
+content_margin_right = 24.0
+content_margin_bottom = 16.0
+
+[node name="Tutorial" type="CanvasLayer"]
+layer = 2
+script = ExtResource("1_tut")
+
+[node name="TutorialPanel" type="PanelContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -160.0
+offset_right = 180.0
+offset_bottom = -90.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("panel_style")
+
+[node name="PromptLabel" type="Label" parent="TutorialPanel"]
+layout_mode = 2
+text = "Welcome, Operative"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.95, 0.85, 0.6, 1)
+
+[node name="HintLabel" type="Label" parent="TutorialPanel"]
+layout_mode = 2
+text = "Follow the instructions to learn the controls."
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.75, 0.75, 0.8, 0.85)
+
+[node name="ProgressLabel" type="Label" parent="TutorialPanel"]
+layout_mode = 2
+text = "0 / 12"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.5, 0.5, 0.55, 0.6)
+
+[node name="SkipLabel" type="Label" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -80.0
+offset_top = -78.0
+offset_right = 80.0
+offset_bottom = -68.0
+grow_horizontal = 2
+grow_vertical = 0
+horizontal_alignment = 1
+text = "[TAB] Skip Tutorial"
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 0.5)

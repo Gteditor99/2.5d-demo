@@ -112,7 +112,7 @@ func attempt_fire() -> bool:
 	return false
 
 func attempt_reload():
-	if current_ammo < weapon_data.magazine_size and reload_timer.is_stopped():
+	if current_ammo < weapon_data.magazine_size and reload_timer.is_stopped() and reserve_ammo > 0:
 		Debug.log("Reloading...")
 		emit_signal("weapon_reload_started")
 		reload_timer.start()
@@ -170,7 +170,9 @@ func _fire():
 
 func _on_reload_finished():
 	var needed_ammo = weapon_data.magazine_size - current_ammo
-	current_ammo += needed_ammo
+	var ammo_to_load = mini(needed_ammo, reserve_ammo)
+	reserve_ammo -= ammo_to_load
+	current_ammo += ammo_to_load
 	emit_signal("weapon_reloaded")
 	emit_signal("ammo_updated", current_ammo, reserve_ammo)
 	Debug.log("Reload finished.")
