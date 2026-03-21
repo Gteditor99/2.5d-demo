@@ -242,13 +242,27 @@ const engine = new Engine(GODOT_CONFIG);
 	const statusProgress = document.getElementById('status-progress');
 	const statusNotice = document.getElementById('status-notice');
 	const pointerLockHint = document.getElementById('pointer-lock-hint');
+	const nativeExitPointerLock = document.exitPointerLock ? document.exitPointerLock.bind(document) : null;
 
 	let initializing = true;
 	let statusMode = '';
 	let gameStarted = false;
+	let keepPointerLock = false;
+
+	if (nativeExitPointerLock) {
+		document.exitPointerLock = function() {
+			if (keepPointerLock && document.pointerLockElement === canvas) {
+				return;
+			}
+			return nativeExitPointerLock();
+		};
+	}
 
 	function syncPointerLockHint() {
 		const pointerLocked = document.pointerLockElement === canvas;
+		if (!pointerLocked) {
+			keepPointerLock = false;
+		}
 		pointerLockHint.classList.toggle('hidden', !gameStarted || pointerLocked);
 	}
 
@@ -256,11 +270,13 @@ const engine = new Engine(GODOT_CONFIG);
 		if (!gameStarted || document.pointerLockElement === canvas || !document.body.contains(canvas)) {
 			return;
 		}
+		keepPointerLock = true;
 		canvas.focus();
 		if (canvas.requestPointerLock) {
 			try {
 				await canvas.requestPointerLock();
 			} catch (error) {
+				keepPointerLock = false;
 				console.warn('Pointer lock request failed:', error);
 			}
 		}
