@@ -89,6 +89,27 @@ body {
 	text-align: center;
 	z-index: 1;
 }
+
+#pointer-lock-hint {
+	position: absolute;
+	left: 50%;
+	bottom: 1.5rem;
+	transform: translateX(-50%);
+	background: rgba(0, 0, 0, 0.75);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	border-radius: 999px;
+	color: #fff;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
+	font-size: 0.95rem;
+	padding: 0.65rem 1rem;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+	z-index: 2;
+}
+
+#pointer-lock-hint.hidden {
+	opacity: 0;
+}
 		</style>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="2.5D.icon.png" />
 <link rel="apple-touch-icon" href="2.5D.apple-touch-icon.png"/>
@@ -108,6 +129,7 @@ body {
 			<progress id="status-progress"></progress>
 			<div id="status-notice"></div>
 		</div>
+		<div id="pointer-lock-hint" class="hidden">Click the game to lock the mouse</div>
 
 		<script>
 // Serve split .pck chunks as a single virtual file for GitHub Pages.
@@ -215,12 +237,38 @@ const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
 (function () {
+	const canvas = document.getElementById('canvas');
 	const statusOverlay = document.getElementById('status');
 	const statusProgress = document.getElementById('status-progress');
 	const statusNotice = document.getElementById('status-notice');
+	const pointerLockHint = document.getElementById('pointer-lock-hint');
 
 	let initializing = true;
 	let statusMode = '';
+	let gameStarted = false;
+
+	function syncPointerLockHint() {
+		const pointerLocked = document.pointerLockElement === canvas;
+		pointerLockHint.classList.toggle('hidden', !gameStarted || pointerLocked);
+	}
+
+	async function requestCanvasPointerLock() {
+		if (!gameStarted || document.pointerLockElement === canvas || !document.body.contains(canvas)) {
+			return;
+		}
+		canvas.focus();
+		if (canvas.requestPointerLock) {
+			try {
+				await canvas.requestPointerLock();
+			} catch (error) {
+				console.warn('Pointer lock request failed:', error);
+			}
+		}
+	}
+
+	canvas.addEventListener('click', requestCanvasPointerLock);
+	canvas.addEventListener('touchend', requestCanvasPointerLock, { passive: true });
+	document.addEventListener('pointerlockchange', syncPointerLockHint);
 
 	function setStatusMode(mode) {
 		if (statusMode === mode || !initializing) {
@@ -309,6 +357,8 @@ const engine = new Engine(GODOT_CONFIG);
 				}
 			},
 		}).then(() => {
+			gameStarted = true;
+			syncPointerLockHint();
 			setStatusMode('hidden');
 		}, displayFailureNotice);
 	}
