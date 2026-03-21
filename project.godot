@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="2.5D"
-run/main_scene="uid://ty0s7a3cfm1m"
+run/main_scene="res://scenes/demo_level.tscn"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 run/physics_ticks_per_second=60

@@ -65,6 +65,11 @@ func _on_state_changed(_previous_state: EnemyAIController.State, new_state: Enem
 func _on_attack_requested() -> void:
         if _npc_data:
                 print("%s attacks for %d damage." % [str(_npc_data.get_identity_key()), _npc_data.attack_damage])
+                # Deal damage to the player
+                if ai_controller and ai_controller.has_player():
+                        var player_health = ai_controller.player.get_node_or_null("HealthComponent")
+                        if player_health and player_health.has_method("take_damage"):
+                                player_health.take_damage(_npc_data.attack_damage)
         else:
                 print("Enemy attack triggered.")
 

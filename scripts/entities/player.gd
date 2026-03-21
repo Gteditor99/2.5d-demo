@@ -112,10 +112,24 @@ func _ready() -> void:
 	if view_model_component:
 		view_model_component.camera = $Head/Camera3D
 
+	# Connect health component
+	var health_component = $HealthComponent as HealthComponent
+	if health_component:
+		health_component.no_health.connect(_on_death)
+		health_component.hurt.connect(_on_hurt)
+
+	# Connect weapon system to HUD
+	if weapon_system_component:
+		weapon_system_component.ammo_updated.connect(_on_ammo_updated)
+
 	# Equip starting item if available
 	var items = inventory_component.get_items()
 	if not items.is_empty():
 		equipment_component.equip_item(items[0])
+
+	# Initialize HUD
+	_update_hud_health()
+	_update_hud_ammo()
 
 
 func _setup_collision_shape() -> void:
@@ -276,11 +290,43 @@ func _handle_mouse_look(event: InputEventMouseMotion) -> void:
 	head_node.rotation.x = _current_pitch
 
 
+func _on_hurt() -> void:
+	_update_hud_health()
+	var hud_node = get_node_or_null("HUD")
+	if hud_node and hud_node.has_method("show_hit_indicator"):
+		hud_node.show_hit_indicator()
+
 func _on_death() -> void:
 	print("Player has died.")
+	$CanvasLayer.visible = true
 	$CanvasLayer/DeathScreen.show()
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	set_physics_process(false)
+	set_process(false)
+	# Connect restart button if it exists
+	var restart_btn = $CanvasLayer/DeathScreen/Panel/Button
+	if restart_btn and not restart_btn.pressed.is_connected(_on_restart):
+		restart_btn.pressed.connect(_on_restart)
+
+func _on_restart() -> void:
+	get_tree().reload_current_scene()
+
+func _on_ammo_updated(current: int, reserve: int) -> void:
+	var hud_node = get_node_or_null("HUD")
+	if hud_node and hud_node.has_method("update_ammo"):
+		hud_node.update_ammo(current, reserve)
+
+func _update_hud_health() -> void:
+	var health_component = $HealthComponent as HealthComponent
+	var hud_node = get_node_or_null("HUD")
+	if health_component and hud_node and hud_node.has_method("update_health"):
+		hud_node.update_health(health_component.health, health_component.max_health)
+
+func _update_hud_ammo() -> void:
+	if weapon_system_component:
+		var hud_node = get_node_or_null("HUD")
+		if hud_node and hud_node.has_method("update_ammo"):
+			hud_node.update_ammo(weapon_system_component.current_ammo, weapon_system_component.reserve_ammo)
 #endregion
 
 #-----------------------------------------------------------------------------
