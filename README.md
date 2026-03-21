@@ -1,11 +1,14 @@
-# Instant Realistic Light
+# 2.5D Demo
 
+Static web export for the 2.5D demo.
 
-A very simple Godot Engine Plugin to get realistic lights on your 3D Scene
-Use free, its free and open source (no atribution needed)
+GitHub Pages:
+https://gteditor99.github.io/2.5d-demo/
 
-
-# Instructions
-1. Save this repo content on ``/Path/Addons/realisticlight``
-2. Enable addon on project settings in addon tab
-3. Open your scene ``.tscn`` and press "Instant Realistic Light" Button and enjoy!
+Project layout:
+- `index.html`: redirect entry point
+- `2.5D.html`: game loader page
+- `2.5D.js`: Godot web runtime bundle
+- `2.5D.wasm`: WebAssembly binary
+- `2.5D.pck.part_00` and `2.5D.pck.part_01`: split game data files
+- `.github/workflows/deploy-pages.yml`: GitHub Pages deployment workflow
