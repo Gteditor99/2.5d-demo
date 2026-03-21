@@ -110,13 +110,68 @@ body {
 		</div>
 
 		<script>
-// Intercept XHR to serve split .pck chunks as a single file
+// Serve split .pck chunks as a single virtual file for GitHub Pages.
 (function() {
 	const PCK_PARTS = ['2.5D.pck.part_00', '2.5D.pck.part_01'];
 	const PCK_TOTAL = 112056296;
+	const nativeFetch = window.fetch.bind(window);
 	const OrigXHR = XMLHttpRequest;
 	const origOpen = OrigXHR.prototype.open;
 	const origSend = OrigXHR.prototype.send;
+
+	function isMainPackRequest(url) {
+		if (!url) {
+			return false;
+		}
+		try {
+			return new URL(url.toString(), window.location.href).pathname.endsWith('/2.5D.pck');
+		} catch (error) {
+			return url.toString().split('?')[0].endsWith('2.5D.pck');
+		}
+	}
+
+	async function loadMainPack(progressCallback) {
+		let loaded = 0;
+		const buffers = [];
+
+		for (const part of PCK_PARTS) {
+			const response = await nativeFetch(new URL(part, window.location.href));
+			if (!response.ok) {
+				throw new Error(`Failed loading file '${part}'`);
+			}
+
+			const buffer = new Uint8Array(await response.arrayBuffer());
+			buffers.push(buffer);
+			loaded += buffer.byteLength;
+			if (progressCallback) {
+				progressCallback(loaded, PCK_TOTAL);
+			}
+		}
+
+		const combined = new Uint8Array(PCK_TOTAL);
+		let offset = 0;
+		for (const buffer of buffers) {
+			combined.set(buffer, offset);
+			offset += buffer.byteLength;
+		}
+
+		return combined.buffer;
+	}
+
+	window.fetch = async function(input, init) {
+		const url = input instanceof Request ? input.url : input;
+		if (isMainPackRequest(url)) {
+			const buffer = await loadMainPack();
+			return new Response(buffer, {
+				status: 200,
+				headers: {
+					'Content-Length': String(PCK_TOTAL),
+					'Content-Type': 'application/octet-stream',
+				},
+			});
+		}
+		return nativeFetch(input, init);
+	};
 
 	OrigXHR.prototype.open = function(method, url) {
 		this._url = url;
@@ -124,43 +179,29 @@ body {
 	};
 
 	OrigXHR.prototype.send = function() {
-		if (this._url && this._url.toString().endsWith('2.5D.pck')) {
+		if (isMainPackRequest(this._url)) {
 			const xhr = this;
 			const onprogress = xhr.onprogress;
 			const onload = xhr.onload;
 			const onreadystatechange = xhr.onreadystatechange;
 
 			(async function() {
-				let loaded = 0;
-				const buffers = [];
-				for (const part of PCK_PARTS) {
-					const resp = await fetch(part);
-					const reader = resp.body.getReader();
-					const chunks = [];
-					while (true) {
-						const {done, value} = await reader.read();
-						if (done) break;
-						chunks.push(value);
-						loaded += value.byteLength;
-						if (onprogress) {
-							onprogress.call(xhr, {loaded: loaded, total: PCK_TOTAL, lengthComputable: true});
-						}
+				const combined = await loadMainPack(function(loaded, total) {
+					if (onprogress) {
+						onprogress.call(xhr, {loaded: loaded, total: total, lengthComputable: true});
 					}
-					const buf = new Uint8Array(chunks.reduce((a, c) => a + c.byteLength, 0));
-					let offset = 0;
-					for (const c of chunks) { buf.set(c, offset); offset += c.byteLength; }
-					buffers.push(buf);
-				}
-				const combined = new Uint8Array(PCK_TOTAL);
-				let off = 0;
-				for (const b of buffers) { combined.set(b, off); off += b.byteLength; }
+				});
 
 				Object.defineProperty(xhr, 'readyState', {get: () => 4});
 				Object.defineProperty(xhr, 'status', {get: () => 200});
-				Object.defineProperty(xhr, 'response', {get: () => combined.buffer});
+				Object.defineProperty(xhr, 'response', {get: () => combined});
 				if (onreadystatechange) onreadystatechange.call(xhr);
 				if (onload) onload.call(xhr);
-			})();
+			})().catch(function(error) {
+				if (xhr.onerror) {
+					xhr.onerror.call(xhr, error);
+				}
+			});
 			return;
 		}
 		return origSend.apply(this, arguments);
@@ -275,4 +316,3 @@ const engine = new Engine(GODOT_CONFIG);
 		</script>
 	</body>
 </html>
-
