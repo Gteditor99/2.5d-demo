@@ -48,6 +48,8 @@ func get_animation_for_state(state: EnemyAIController.State) -> StringName:
 						return _resolve_animation(chase_animation)
 				EnemyAIController.State.ATTACK:
 						return _resolve_animation(attack_animation)
+				EnemyAIController.State.STAGGER:
+						return _resolve_animation(hurt_animation)
 				EnemyAIController.State.DEAD:
 						return _resolve_animation(dead_animation)
 				_:

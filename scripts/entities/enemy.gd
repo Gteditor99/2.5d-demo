@@ -81,6 +81,13 @@ func _on_hurt() -> void:
         else:
                 print("Enemy was hurt.")
 
+        # Stagger the enemy on hit so they visibly react to damage
+        if ai_controller and ai_controller.state != EnemyAIController.State.DEAD:
+                var stagger_time := 0.35
+                if _active_behavior and "stagger_duration" in _active_behavior:
+                        stagger_time = _active_behavior.stagger_duration
+                ai_controller.apply_stagger(stagger_time)
+
 
 func _on_no_health() -> void:
         print("Enemy has died.")

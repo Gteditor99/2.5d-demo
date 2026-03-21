@@ -16,10 +16,11 @@ var parent_body: CharacterBody3D
 var movement_component: MovementComponent
 var player: CharacterBody3D
 
-enum State {IDLE, CHASE, ATTACK, DEAD}
+enum State {IDLE, CHASE, ATTACK, STAGGER, DEAD}
 var state: State = State.IDLE
 var _behavior: EnemyAIBehavior
 var _applied_behavior: EnemyAIBehavior
+var _stagger_timer: float = 0.0
 
 func _ready() -> void:
         parent_body = get_parent() as CharacterBody3D
@@ -35,6 +36,13 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
         if state == State.DEAD or not _behavior:
+                return
+
+        if state == State.STAGGER:
+                _stagger_timer -= delta
+                stop_movement()
+                if _stagger_timer <= 0.0:
+                        set_state(State.CHASE)
                 return
 
         _ensure_player()
@@ -105,6 +113,22 @@ func face_player() -> void:
         var target_position: Vector3 = player.global_position
         target_position.y = parent_body.global_position.y
         parent_body.look_at(target_position, Vector3.UP)
+
+func apply_stagger(duration: float = 0.35) -> void:
+        if state == State.DEAD:
+                return
+        _stagger_timer = duration
+        set_state(State.STAGGER)
+        stop_movement()
+
+func strafe_around_player(strafe_direction: float) -> void:
+        if not has_player() or not movement_component:
+                return
+        var to_player: Vector3 = player.global_position - parent_body.global_position
+        var lateral := Vector3(-to_player.z, 0.0, to_player.x).normalized()
+        var strafe_vec := lateral * strafe_direction
+        var flat := Vector2(strafe_vec.x, strafe_vec.z)
+        movement_component.set_input_direction(flat)
 
 func ensure_state(target_state: State) -> void:
         if state != target_state:
