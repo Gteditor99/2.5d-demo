@@ -2,9 +2,9 @@ extends CanvasLayer
 
 signal tutorial_completed
 
-@onready var prompt_label: Label = $TutorialPanel/PromptLabel
-@onready var hint_label: Label = $TutorialPanel/HintLabel
-@onready var progress_label: Label = $TutorialPanel/ProgressLabel
+@onready var prompt_label: Label = $TutorialPanel/VBox/PromptLabel
+@onready var hint_label: Label = $TutorialPanel/VBox/HintLabel
+@onready var progress_label: Label = $TutorialPanel/VBox/ProgressLabel
 @onready var panel: PanelContainer = $TutorialPanel
 @onready var skip_label: Label = $SkipLabel
 

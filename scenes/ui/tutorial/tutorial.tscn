@@ -3,20 +3,20 @@
 [ext_resource type="Script" path="res://scripts/ui/tutorial/tutorial_system.gd" id="1_tut"]
 
 [sub_resource type="StyleBoxFlat" id="panel_style"]
-bg_color = Color(0.05, 0.05, 0.08, 0.75)
-border_width_left = 2
-border_width_top = 0
-border_width_right = 0
-border_width_bottom = 0
-border_color = Color(0.85, 0.7, 0.3, 0.8)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 24.0
-content_margin_top = 16.0
-content_margin_right = 24.0
-content_margin_bottom = 16.0
+bg_color = Color(0.06, 0.06, 0.1, 0.85)
+border_width_left = 3
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85, 0.7, 0.3, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 32.0
+content_margin_top = 20.0
+content_margin_right = 32.0
+content_margin_bottom = 20.0
 
 [node name="Tutorial" type="CanvasLayer"]
 layer = 2
@@ -28,34 +28,40 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -180.0
-offset_top = -160.0
-offset_right = 180.0
-offset_bottom = -90.0
+offset_left = -260.0
+offset_top = -200.0
+offset_right = 260.0
+offset_bottom = -100.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("panel_style")
 
-[node name="PromptLabel" type="Label" parent="TutorialPanel"]
+[node name="VBox" type="VBoxContainer" parent="TutorialPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PromptLabel" type="Label" parent="TutorialPanel/VBox"]
 layout_mode = 2
 text = "Welcome, Operative"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 22
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 28
 theme_override_colors/font_color = Color(0.95, 0.85, 0.6, 1)
 
-[node name="HintLabel" type="Label" parent="TutorialPanel"]
+[node name="HintLabel" type="Label" parent="TutorialPanel/VBox"]
 layout_mode = 2
 text = "Follow the instructions to learn the controls."
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.75, 0.75, 0.8, 0.85)
+autowrap_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.78, 0.78, 0.84, 0.9)
 
-[node name="ProgressLabel" type="Label" parent="TutorialPanel"]
+[node name="ProgressLabel" type="Label" parent="TutorialPanel/VBox"]
 layout_mode = 2
 text = "0 / 12"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.5, 0.5, 0.55, 0.6)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.55, 0.55, 0.6, 0.65)
 
 [node name="SkipLabel" type="Label" parent="."]
 anchors_preset = 7
@@ -63,13 +69,13 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -80.0
-offset_top = -78.0
-offset_right = 80.0
-offset_bottom = -68.0
+offset_left = -120.0
+offset_top = -86.0
+offset_right = 120.0
+offset_bottom = -70.0
 grow_horizontal = 2
 grow_vertical = 0
 horizontal_alignment = 1
 text = "[TAB] Skip Tutorial"
-theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 0.5)
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.55, 0.55, 0.55, 0.5)
