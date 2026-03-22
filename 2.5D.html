@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<script src="coi-serviceworker.js"></script>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>2.5D</title>
@@ -89,27 +90,6 @@ body {
 	text-align: center;
 	z-index: 1;
 }
-
-#pointer-lock-hint {
-	position: absolute;
-	left: 50%;
-	bottom: 1.5rem;
-	transform: translateX(-50%);
-	background: rgba(0, 0, 0, 0.75);
-	border: 1px solid rgba(255, 255, 255, 0.25);
-	border-radius: 999px;
-	color: #fff;
-	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
-	font-size: 0.95rem;
-	padding: 0.65rem 1rem;
-	pointer-events: none;
-	transition: opacity 0.2s ease;
-	z-index: 2;
-}
-
-#pointer-lock-hint.hidden {
-	opacity: 0;
-}
 		</style>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="2.5D.icon.png" />
 <link rel="apple-touch-icon" href="2.5D.apple-touch-icon.png"/>
@@ -129,162 +109,20 @@ body {
 			<progress id="status-progress"></progress>
 			<div id="status-notice"></div>
 		</div>
-		<div id="pointer-lock-hint" class="hidden">Click the game to lock the mouse</div>
 
-		<script>
-// Serve split .pck chunks as a single virtual file for GitHub Pages.
-(function() {
-	const PCK_PARTS = ['2.5D.pck.part_00', '2.5D.pck.part_01'];
-	const PCK_TOTAL = 112056296;
-	const nativeFetch = window.fetch.bind(window);
-	const OrigXHR = XMLHttpRequest;
-	const origOpen = OrigXHR.prototype.open;
-	const origSend = OrigXHR.prototype.send;
-
-	function isMainPackRequest(url) {
-		if (!url) {
-			return false;
-		}
-		try {
-			return new URL(url.toString(), window.location.href).pathname.endsWith('/2.5D.pck');
-		} catch (error) {
-			return url.toString().split('?')[0].endsWith('2.5D.pck');
-		}
-	}
-
-	async function loadMainPack(progressCallback) {
-		let loaded = 0;
-		const buffers = [];
-
-		for (const part of PCK_PARTS) {
-			const response = await nativeFetch(new URL(part, window.location.href));
-			if (!response.ok) {
-				throw new Error(`Failed loading file '${part}'`);
-			}
-
-			const buffer = new Uint8Array(await response.arrayBuffer());
-			buffers.push(buffer);
-			loaded += buffer.byteLength;
-			if (progressCallback) {
-				progressCallback(loaded, PCK_TOTAL);
-			}
-		}
-
-		const combined = new Uint8Array(PCK_TOTAL);
-		let offset = 0;
-		for (const buffer of buffers) {
-			combined.set(buffer, offset);
-			offset += buffer.byteLength;
-		}
-
-		return combined.buffer;
-	}
-
-	window.fetch = async function(input, init) {
-		const url = input instanceof Request ? input.url : input;
-		if (isMainPackRequest(url)) {
-			const buffer = await loadMainPack();
-			return new Response(buffer, {
-				status: 200,
-				headers: {
-					'Content-Length': String(PCK_TOTAL),
-					'Content-Type': 'application/octet-stream',
-				},
-			});
-		}
-		return nativeFetch(input, init);
-	};
-
-	OrigXHR.prototype.open = function(method, url) {
-		this._url = url;
-		return origOpen.apply(this, arguments);
-	};
-
-	OrigXHR.prototype.send = function() {
-		if (isMainPackRequest(this._url)) {
-			const xhr = this;
-			const onprogress = xhr.onprogress;
-			const onload = xhr.onload;
-			const onreadystatechange = xhr.onreadystatechange;
-
-			(async function() {
-				const combined = await loadMainPack(function(loaded, total) {
-					if (onprogress) {
-						onprogress.call(xhr, {loaded: loaded, total: total, lengthComputable: true});
-					}
-				});
-
-				Object.defineProperty(xhr, 'readyState', {get: () => 4});
-				Object.defineProperty(xhr, 'status', {get: () => 200});
-				Object.defineProperty(xhr, 'response', {get: () => combined});
-				if (onreadystatechange) onreadystatechange.call(xhr);
-				if (onload) onload.call(xhr);
-			})().catch(function(error) {
-				if (xhr.onerror) {
-					xhr.onerror.call(xhr, error);
-				}
-			});
-			return;
-		}
-		return origSend.apply(this, arguments);
-	};
-})();
-		</script>
 		<script src="2.5D.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"2.5D","experimentalVK":false,"fileSizes":{"2.5D.pck":112056296,"2.5D.wasm":38057390},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"2.5D","experimentalVK":false,"fileSizes":{"2.5D.pck":112113228,"2.5D.wasm":38057390},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
 (function () {
-	const canvas = document.getElementById('canvas');
 	const statusOverlay = document.getElementById('status');
 	const statusProgress = document.getElementById('status-progress');
 	const statusNotice = document.getElementById('status-notice');
-	const pointerLockHint = document.getElementById('pointer-lock-hint');
-	const nativeExitPointerLock = document.exitPointerLock ? document.exitPointerLock.bind(document) : null;
 
 	let initializing = true;
 	let statusMode = '';
-	let gameStarted = false;
-	let keepPointerLock = false;
-
-	if (nativeExitPointerLock) {
-		document.exitPointerLock = function() {
-			if (keepPointerLock && document.pointerLockElement === canvas) {
-				return;
-			}
-			return nativeExitPointerLock();
-		};
-	}
-
-	function syncPointerLockHint() {
-		const pointerLocked = document.pointerLockElement === canvas;
-		if (!pointerLocked) {
-			keepPointerLock = false;
-		}
-		pointerLockHint.classList.toggle('hidden', !gameStarted || pointerLocked);
-	}
-
-	async function requestCanvasPointerLock() {
-		if (!gameStarted || document.pointerLockElement === canvas || !document.body.contains(canvas)) {
-			return;
-		}
-		keepPointerLock = true;
-		canvas.focus();
-		if (canvas.requestPointerLock) {
-			try {
-				await canvas.requestPointerLock();
-			} catch (error) {
-				keepPointerLock = false;
-				console.warn('Pointer lock request failed:', error);
-			}
-		}
-	}
-
-	canvas.addEventListener('click', requestCanvasPointerLock);
-	canvas.addEventListener('touchend', requestCanvasPointerLock, { passive: true });
-	document.addEventListener('pointerlockchange', syncPointerLockHint);
 
 	function setStatusMode(mode) {
 		if (statusMode === mode || !initializing) {
@@ -373,8 +211,6 @@ const engine = new Engine(GODOT_CONFIG);
 				}
 			},
 		}).then(() => {
-			gameStarted = true;
-			syncPointerLockHint();
 			setStatusMode('hidden');
 		}, displayFailureNotice);
 	}
@@ -382,3 +218,4 @@ const engine = new Engine(GODOT_CONFIG);
 		</script>
 	</body>
 </html>
+
