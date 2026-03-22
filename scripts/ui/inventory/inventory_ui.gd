@@ -58,16 +58,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func open_inventory() -> void:
 	visible = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().paused = true
+	_refresh_mouse_capture()
 	update_ui()
 
 
 func close_inventory() -> void:
 	visible = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	get_tree().paused = false
 	_clear_selection()
+	_refresh_mouse_capture()
 
 
 func update_ui() -> void:
@@ -124,3 +124,11 @@ func _on_drop_button_pressed() -> void:
 	if selected_item and inventory:
 		inventory.drop_item(selected_item)
 		item_dropped.emit(selected_item)
+
+
+func _refresh_mouse_capture() -> void:
+	var player := get_tree().get_first_node_in_group("Player")
+	if player and player.has_method("_refresh_mouse_capture"):
+		player._refresh_mouse_capture()
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if visible else Input.MOUSE_MODE_CAPTURED
