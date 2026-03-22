@@ -28,7 +28,7 @@ var _knockback_velocity: Vector3 = Vector3.ZERO
 var _scale_punch_timer: float = 0.0
 var _original_sprite_scale: Vector3
 var _detection_sound: AudioStreamPlayer3D
-var _death_sound: AudioStreamPlayer3D
+var _hurt_sound: AudioStreamPlayer3D
 var _has_detected_player: bool = false
 
 
@@ -73,8 +73,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _setup_audio() -> void:
-        var detection_stream = load("res://assets/audio/1.wav")
-        var death_stream = load("res://assets/audio/2.wav")
+        var detection_stream = load("res://resources/1.mp3")
+        var hurt_stream = load("res://resources/2.mp3")
 
         if detection_stream:
                 _detection_sound = AudioStreamPlayer3D.new()
@@ -82,11 +82,11 @@ func _setup_audio() -> void:
                 _detection_sound.max_distance = 20.0
                 add_child(_detection_sound)
 
-        if death_stream:
-                _death_sound = AudioStreamPlayer3D.new()
-                _death_sound.stream = death_stream
-                _death_sound.max_distance = 20.0
-                add_child(_death_sound)
+        if hurt_stream:
+                _hurt_sound = AudioStreamPlayer3D.new()
+                _hurt_sound.stream = hurt_stream
+                _hurt_sound.max_distance = 20.0
+                add_child(_hurt_sound)
 
 
 func _apply_npc_data() -> void:
@@ -142,6 +142,9 @@ func _on_attack_requested() -> void:
 func _on_hurt() -> void:
         _apply_hit_feedback()
 
+        if _hurt_sound:
+                _hurt_sound.play()
+
         if _npc_data:
                 _play_animation(_npc_data.get_hurt_animation())
 
@@ -174,10 +177,6 @@ func _apply_hit_feedback() -> void:
 func _on_no_health() -> void:
         print("Enemy has died.")
 
-        # Play death sound
-        if _death_sound:
-                _death_sound.play()
-
         set_physics_process(false)
 
         if ai_controller:
@@ -203,8 +202,4 @@ func _play_animation(anim_name: StringName) -> void:
 func _on_animated_sprite_3d_animation_finished() -> void:
         var death_animation := _npc_data.get_death_animation() if _npc_data else &"death"
         if animated_sprite.animation == death_animation:
-                # Wait for death sound to finish before freeing
-                if _death_sound and _death_sound.playing:
-                        _death_sound.finished.connect(queue_free)
-                else:
-                        queue_free()
+                queue_free()

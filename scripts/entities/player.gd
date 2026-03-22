@@ -401,19 +401,15 @@ func _update_head_bob(delta: float) -> void:
 	_current_bob_amplitude = lerp(_current_bob_amplitude, target_bob_amplitude, delta * 10.0)
 	_current_bob_amplitude_roll = lerp(_current_bob_amplitude_roll, target_bob_amplitude_roll, delta * 10.0)
 
-	var bob_offset_y: float = 0.0
 	if _current_bob_amplitude > 0.001:
 		var bob_phase = _bob_time * 2.0 * PI
-		bob_offset_y = sin(bob_phase) * _current_bob_amplitude
+		var bob_offset_y = sin(bob_phase) * _current_bob_amplitude
+		head_node.position.y = _current_head_y_base + bob_offset_y + _stair_head_offset
 		bob_offset_roll_this_frame = sin(bob_phase * 0.5) * _current_bob_amplitude_roll
+	else:
+		head_node.position.y = lerp(head_node.position.y, _current_head_y_base + _stair_head_offset, delta * 20.0)
 
-	# Apply bob to viewmodel only (not the camera/head)
-	if view_model_component:
-		view_model_component.apply_bob(Vector3(0.0, bob_offset_y, 0.0), bob_offset_roll_this_frame)
-
-	# Head only gets stair offset, peek, and tilt — no bobbing
-	head_node.position.y = lerp(head_node.position.y, _current_head_y_base + _stair_head_offset, delta * 20.0)
-	head_node.rotation.z = _current_applied_peek_roll + _wasd_tilt
+	head_node.rotation.z = _current_applied_peek_roll + bob_offset_roll_this_frame + _wasd_tilt
 
 var _stair_head_offset: float = 0.0
 
