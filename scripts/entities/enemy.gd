@@ -73,8 +73,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _setup_audio() -> void:
-        var detection_stream = load("res://assets/audio/1.mp3")
-        var death_stream = load("res://assets/audio/2.mp3")
+        var detection_stream = load("res://assets/audio/1.wav")
+        var death_stream = load("res://assets/audio/2.wav")
 
         if detection_stream:
                 _detection_sound = AudioStreamPlayer3D.new()
