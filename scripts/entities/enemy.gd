@@ -166,7 +166,7 @@ func _apply_hit_feedback() -> void:
         # Knockback away from player
         var player := get_tree().get_first_node_in_group("Player")
         if player and player is Node3D:
-                var knockback_dir := (global_position - player.global_position).normalized()
+                var knockback_dir: Vector3 = (global_position - player.global_position).normalized()
                 knockback_dir.y = 0.0
                 _knockback_velocity = knockback_dir * hit_knockback_force
 
