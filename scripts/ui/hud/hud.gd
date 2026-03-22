@@ -12,11 +12,27 @@ extends CanvasLayer
 @onready var reload_bar: ProgressBar = $ReloadBar
 @onready var interaction_prompt: Label = $InteractionPrompt
 @onready var wave_complete_label: Label = $WaveCompleteLabel
+@onready var tutorial_panel: PanelContainer = $TutorialPanel
+@onready var tutorial_label: Label = $TutorialPanel/TutorialLabel
 
 var _hit_indicator_timer: float = 0.0
 var _reload_active: bool = false
 var _reload_elapsed: float = 0.0
 var _reload_duration: float = 2.5
+
+# Tutorial
+var _tutorial_steps: Array[String] = [
+	"WASD - Move    |    Mouse - Look Around",
+	"Left Click - Shoot    |    Right Click - Aim",
+	"R - Reload    |    V - Switch Fire Mode",
+	"I - Inventory    |    F - Pick Up Items",
+	"Q / E - Peek    |    Shift - Sprint    |    C - Crouch",
+]
+var _current_tutorial_step: int = 0
+var _tutorial_step_timer: float = 0.0
+var _tutorial_total_timer: float = 0.0
+var _tutorial_visible: bool = true
+const TUTORIAL_STEP_DURATION: float = 5.0
 
 func _ready():
 	hit_indicator.visible = false
@@ -24,6 +40,7 @@ func _ready():
 	reload_bar.visible = false
 	interaction_prompt.visible = false
 	wave_complete_label.visible = false
+	_show_tutorial_step(0)
 
 func _process(delta: float):
 	if _hit_indicator_timer > 0.0:
@@ -38,6 +55,26 @@ func _process(delta: float):
 		if _reload_elapsed >= _reload_duration:
 			_reload_active = false
 			reload_bar.visible = false
+
+	# Tutorial cycling
+	if _tutorial_visible and tutorial_panel:
+		_tutorial_step_timer += delta
+		_tutorial_total_timer += delta
+
+		if _tutorial_step_timer >= TUTORIAL_STEP_DURATION:
+			_tutorial_step_timer = 0.0
+			_current_tutorial_step += 1
+			if _current_tutorial_step < _tutorial_steps.size():
+				_show_tutorial_step(_current_tutorial_step)
+			else:
+				_tutorial_visible = false
+				tutorial_panel.visible = false
+
+		# Fade tutorial near the end
+		var total_time = TUTORIAL_STEP_DURATION * _tutorial_steps.size()
+		if _tutorial_total_timer > total_time - 2.0:
+			var fade = clamp((total_time - _tutorial_total_timer) / 2.0, 0.0, 1.0)
+			tutorial_panel.modulate.a = fade
 
 func update_health(current: int, maximum: int):
 	health_bar.max_value = maximum
@@ -106,3 +143,9 @@ func show_interaction_prompt(text: String):
 
 func hide_interaction_prompt():
 	interaction_prompt.visible = false
+
+func _show_tutorial_step(step: int) -> void:
+	if step < _tutorial_steps.size() and tutorial_label and tutorial_panel:
+		tutorial_label.text = _tutorial_steps[step]
+		tutorial_panel.visible = true
+		tutorial_panel.modulate.a = 1.0

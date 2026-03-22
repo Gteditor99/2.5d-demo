@@ -23,6 +23,13 @@ var recoil_debug_menu_instance: PanelContainer
 var sway_target: Vector3 = Vector3.ZERO
 var current_sway: Vector3 = Vector3.ZERO
 
+# Muzzle flash
+var _muzzle_flash_light: OmniLight3D
+var _muzzle_flash_timer: float = 0.0
+const MUZZLE_FLASH_DURATION: float = 0.04
+const MUZZLE_FLASH_ENERGY: float = 8.0
+const MUZZLE_FLASH_RANGE: float = 4.0
+
 func _ready():
 	# Timers are added to the scene tree so they can process.
 	add_child(fire_rate_timer)
@@ -71,6 +78,16 @@ func handle_mouse_motion(event: InputEventMouseMotion):
 
 	sway_target.y = clamp(sway_target.y - event.relative.x * sway_intensity, -weapon_data.max_sway_x, weapon_data.max_sway_x)
 	sway_target.x = clamp(sway_target.x - event.relative.y * sway_intensity, -weapon_data.max_sway_y, weapon_data.max_sway_y)
+
+func _process(delta: float) -> void:
+	# Muzzle flash decay
+	if _muzzle_flash_timer > 0.0:
+		_muzzle_flash_timer -= delta
+		if _muzzle_flash_light:
+			var t := clamp(_muzzle_flash_timer / MUZZLE_FLASH_DURATION, 0.0, 1.0)
+			_muzzle_flash_light.light_energy = MUZZLE_FLASH_ENERGY * t * t
+			if _muzzle_flash_timer <= 0.0:
+				_muzzle_flash_light.visible = false
 
 func _physics_process(delta):
 	if not weapon_data: return
@@ -139,6 +156,9 @@ func _fire():
 		if animation_player and animation_player.has_animation("animation"):
 			animation_player.play("animation")
 
+	# Muzzle flash
+	_trigger_muzzle_flash()
+
 	# Instantiate and fire projectile
 	if weapon_data.projectile_scene:
 		var projectile_instance = projectile_pool.get_projectile()
@@ -167,6 +187,29 @@ func _fire():
 				projectile_instance.add_collision_exception_with(owner_entity)
 
 			projectile_component.fire()
+
+func _trigger_muzzle_flash() -> void:
+	var owner_entity = get_owner() as Node3D
+	if not owner_entity or not owner_entity.has_method("get_barrel_node"):
+		return
+
+	var barrel_node = owner_entity.get_barrel_node()
+	if not barrel_node:
+		return
+
+	# Create or reuse the muzzle flash light
+	if not _muzzle_flash_light:
+		_muzzle_flash_light = OmniLight3D.new()
+		_muzzle_flash_light.light_color = Color(1.0, 0.85, 0.5)
+		_muzzle_flash_light.omni_range = MUZZLE_FLASH_RANGE
+		_muzzle_flash_light.omni_attenuation = 2.0
+		_muzzle_flash_light.shadow_enabled = false
+		barrel_node.add_child(_muzzle_flash_light)
+
+	_muzzle_flash_light.visible = true
+	_muzzle_flash_light.light_energy = MUZZLE_FLASH_ENERGY
+	_muzzle_flash_timer = MUZZLE_FLASH_DURATION
+
 
 func _on_reload_finished():
 	var needed_ammo = weapon_data.magazine_size - current_ammo

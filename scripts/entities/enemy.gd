@@ -8,6 +8,12 @@ extends CharacterBody3D
         get:
                 return _npc_data
 
+@export_group("Hit Feedback")
+@export var hit_flash_duration: float = 0.08
+@export var hit_flash_color: Color = Color(10.0, 10.0, 10.0, 1.0)
+@export var hit_knockback_force: float = 3.0
+@export var hit_scale_punch: float = 1.15
+
 @onready var ai_controller: EnemyAIController = $EnemyAIController
 @onready var movement_component: MovementComponent = $MovementComponent
 @onready var health_component: HealthComponent = $HealthComponent
@@ -16,6 +22,14 @@ extends CharacterBody3D
 
 var _npc_data: NPCData
 var _active_behavior: EnemyAIBehavior
+var _hit_flash_timer: float = 0.0
+var _original_modulate: Color = Color.WHITE
+var _knockback_velocity: Vector3 = Vector3.ZERO
+var _scale_punch_timer: float = 0.0
+var _original_sprite_scale: Vector3
+var _detection_sound: AudioStreamPlayer3D
+var _death_sound: AudioStreamPlayer3D
+var _has_detected_player: bool = false
 
 
 func _ready() -> void:
@@ -27,7 +41,52 @@ func _ready() -> void:
                 ai_controller.state_changed.connect(_on_state_changed)
                 ai_controller.attack_requested.connect(_on_attack_requested)
 
+        if animated_sprite:
+                _original_sprite_scale = animated_sprite.scale
+                _original_modulate = animated_sprite.modulate
+
+        _setup_audio()
         _apply_npc_data()
+
+
+func _process(delta: float) -> void:
+        # Hit flash effect
+        if _hit_flash_timer > 0.0:
+                _hit_flash_timer -= delta
+                if _hit_flash_timer <= 0.0 and animated_sprite:
+                        animated_sprite.modulate = _original_modulate
+
+        # Scale punch recovery
+        if _scale_punch_timer > 0.0:
+                _scale_punch_timer -= delta
+                if animated_sprite:
+                        var t := clamp(_scale_punch_timer / hit_flash_duration, 0.0, 1.0)
+                        animated_sprite.scale = _original_sprite_scale * lerpf(1.0, hit_scale_punch, t)
+
+
+func _physics_process(delta: float) -> void:
+        # Apply knockback
+        if _knockback_velocity.length_squared() > 0.01:
+                _knockback_velocity = _knockback_velocity.lerp(Vector3.ZERO, 8.0 * delta)
+                velocity = _knockback_velocity
+                move_and_slide()
+
+
+func _setup_audio() -> void:
+        var detection_stream = load("res://assets/audio/1.mp3")
+        var death_stream = load("res://assets/audio/2.mp3")
+
+        if detection_stream:
+                _detection_sound = AudioStreamPlayer3D.new()
+                _detection_sound.stream = detection_stream
+                _detection_sound.max_distance = 20.0
+                add_child(_detection_sound)
+
+        if death_stream:
+                _death_sound = AudioStreamPlayer3D.new()
+                _death_sound.stream = death_stream
+                _death_sound.max_distance = 20.0
+                add_child(_death_sound)
 
 
 func _apply_npc_data() -> void:
@@ -58,6 +117,12 @@ func _on_state_changed(_previous_state: EnemyAIController.State, new_state: Enem
         if not _npc_data:
                 return
 
+        # Play detection sound on first chase
+        if new_state == EnemyAIController.State.CHASE and not _has_detected_player:
+                _has_detected_player = true
+                if _detection_sound:
+                        _detection_sound.play()
+
         var animation_name := _npc_data.get_animation_for_state(new_state)
         _play_animation(animation_name)
 
@@ -75,11 +140,10 @@ func _on_attack_requested() -> void:
 
 
 func _on_hurt() -> void:
+        _apply_hit_feedback()
+
         if _npc_data:
                 _play_animation(_npc_data.get_hurt_animation())
-                print("%s was hurt." % str(_npc_data.get_identity_key()))
-        else:
-                print("Enemy was hurt.")
 
         # Stagger the enemy on hit so they visibly react to damage
         if ai_controller and ai_controller.state != EnemyAIController.State.DEAD:
@@ -89,8 +153,31 @@ func _on_hurt() -> void:
                 ai_controller.apply_stagger(stagger_time)
 
 
+func _apply_hit_feedback() -> void:
+        # White flash
+        if animated_sprite:
+                animated_sprite.modulate = hit_flash_color
+                _hit_flash_timer = hit_flash_duration
+
+        # Scale punch
+        if animated_sprite:
+                _scale_punch_timer = hit_flash_duration
+
+        # Knockback away from player
+        var player := get_tree().get_first_node_in_group("Player")
+        if player and player is Node3D:
+                var knockback_dir := (global_position - player.global_position).normalized()
+                knockback_dir.y = 0.0
+                _knockback_velocity = knockback_dir * hit_knockback_force
+
+
 func _on_no_health() -> void:
         print("Enemy has died.")
+
+        # Play death sound
+        if _death_sound:
+                _death_sound.play()
+
         set_physics_process(false)
 
         if ai_controller:
@@ -108,12 +195,16 @@ func _on_no_health() -> void:
                 _play_animation(&"death")
 
 
-func _play_animation(name: StringName) -> void:
-        if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation(name):
-                animated_sprite.play(name)
+func _play_animation(anim_name: StringName) -> void:
+        if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation(anim_name):
+                animated_sprite.play(anim_name)
 
 
 func _on_animated_sprite_3d_animation_finished() -> void:
         var death_animation := _npc_data.get_death_animation() if _npc_data else &"death"
         if animated_sprite.animation == death_animation:
-                queue_free()
+                # Wait for death sound to finish before freeing
+                if _death_sound and _death_sound.playing:
+                        _death_sound.finished.connect(queue_free)
+                else:
+                        queue_free()

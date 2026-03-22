@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" uid="uid://hud_script_001" path="res://scripts/ui/hud/hud.gd" id="1_hud"]
 
@@ -15,6 +15,17 @@ corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="tutorial_bg"]
+bg_color = Color(0.0, 0.0, 0.0, 0.55)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 24.0
+content_margin_top = 12.0
+content_margin_right = 24.0
+content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxFlat" id="reload_fill"]
 bg_color = Color(0.9, 0.8, 0.2, 0.85)
@@ -309,3 +320,26 @@ vertical_alignment = 1
 text = "[F] Pick up"
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 0.75)
+
+[node name="TutorialPanel" type="PanelContainer" parent="."]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -120.0
+offset_right = 300.0
+offset_bottom = -76.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("tutorial_bg")
+
+[node name="TutorialLabel" type="Label" parent="TutorialPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_font_sizes/font_size = 22
+text = "WASD - Move"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
