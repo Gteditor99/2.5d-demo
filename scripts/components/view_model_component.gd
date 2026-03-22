@@ -34,6 +34,8 @@ var _rotational_recoil_velocity: Vector3
 var _positional_recoil_offset: Vector3
 var _rotational_recoil_offset: Vector3
 var _sway_rotation: Vector3 = Vector3.ZERO
+var _bob_offset: Vector3 = Vector3.ZERO
+var _bob_rotation: Vector3 = Vector3.ZERO
 var _recoil_time: float = 0.0
 var _is_recording_recoil: bool = false
 var _recoil_history_positional: Array = []
@@ -110,15 +112,15 @@ func _physics_process(delta: float) -> void:
 			_rotational_recoil_velocity.y += rot_curve_y * delta * 0.3
 			_rotational_recoil_velocity.z += rot_curve_z * recoil_data.rotational_kick_back * delta
 
-		weapon_node.position = _current_position + _positional_recoil_offset
-		weapon_node.rotation = _current_rotation + _rotational_recoil_offset + _sway_rotation
+		weapon_node.position = _current_position + _positional_recoil_offset + _bob_offset
+		weapon_node.rotation = _current_rotation + _rotational_recoil_offset + _sway_rotation + _bob_rotation
 		
 		if _is_recording_recoil:
 			_recoil_history_positional.append(_positional_recoil_offset)
 			_recoil_history_rotational.append(_rotational_recoil_offset)
 	else:
-		weapon_node.position = _current_position
-		weapon_node.rotation = _current_rotation + _sway_rotation
+		weapon_node.position = _current_position + _bob_offset
+		weapon_node.rotation = _current_rotation + _sway_rotation + _bob_rotation
 
 	camera.fov = lerp(camera.fov, _target_fov, delta * _transition_speed)
 
@@ -214,3 +216,7 @@ func set_weapon_system_component(node: Node):
 
 func apply_sway(sway: Vector3):
 	_sway_rotation = Vector3(deg_to_rad(sway.x), deg_to_rad(sway.y), deg_to_rad(sway.z))
+
+func apply_bob(offset: Vector3, rotation: Vector3 = Vector3.ZERO):
+	_bob_offset = offset
+	_bob_rotation = rotation

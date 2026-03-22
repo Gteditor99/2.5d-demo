@@ -25,6 +25,11 @@ extends CharacterBody3D
 @export var bob_frequency: float = 3.0
 @export var bob_amplitude: float = 0.1
 @export var bob_amplitude_roll: float = 0.03
+
+@export_group("Sprint Weapon Bob")
+@export var sprint_weapon_bob_position: Vector3 = Vector3(0.018, 0.03, 0.012)
+@export var sprint_weapon_bob_rotation_degrees: Vector3 = Vector3(2.5, 1.25, 2.0)
+@export var sprint_weapon_bob_smoothing: float = 12.0
 #endregion
 #region Stair Stepping Constants
 const STAIRS_FEELING_COEFFICIENT: float = 2.5
@@ -74,6 +79,8 @@ var _initial_head_local_x: float
 var _current_head_y_base: float
 var _current_bob_amplitude: float = 0.0
 var _current_bob_amplitude_roll: float = 0.0
+var _current_weapon_bob_offset: Vector3 = Vector3.ZERO
+var _current_weapon_bob_rotation: Vector3 = Vector3.ZERO
 
 # --- Crouching ---
 var _standing_collider_y_pos: float
@@ -400,9 +407,9 @@ func _update_head_bob(delta: float) -> void:
 
 	_current_bob_amplitude = lerp(_current_bob_amplitude, target_bob_amplitude, delta * 10.0)
 	_current_bob_amplitude_roll = lerp(_current_bob_amplitude_roll, target_bob_amplitude_roll, delta * 10.0)
+	var bob_phase: float = _bob_time * 2.0 * PI
 
 	if _current_bob_amplitude > 0.001:
-		var bob_phase = _bob_time * 2.0 * PI
 		var bob_offset_y = sin(bob_phase) * _current_bob_amplitude
 		head_node.position.y = _current_head_y_base + bob_offset_y + _stair_head_offset
 		bob_offset_roll_this_frame = sin(bob_phase * 0.5) * _current_bob_amplitude_roll
@@ -410,6 +417,30 @@ func _update_head_bob(delta: float) -> void:
 		head_node.position.y = lerp(head_node.position.y, _current_head_y_base + _stair_head_offset, delta * 20.0)
 
 	head_node.rotation.z = _current_applied_peek_roll + bob_offset_roll_this_frame + _wasd_tilt
+
+	var target_weapon_bob_offset := Vector3.ZERO
+	var target_weapon_bob_rotation := Vector3.ZERO
+
+	if is_moving_on_floor and _current_player_state == PlayerState.SPRINTING:
+		var lateral_swing = sin(bob_phase * 0.5)
+		var bounce = 0.5 - 0.5 * cos(bob_phase)
+		var forward_pulse = 0.5 - 0.5 * cos(bob_phase + PI * 0.25)
+		target_weapon_bob_offset = Vector3(
+			lateral_swing * sprint_weapon_bob_position.x,
+			bounce * sprint_weapon_bob_position.y,
+			forward_pulse * sprint_weapon_bob_position.z
+		)
+		target_weapon_bob_rotation = Vector3(
+			deg_to_rad(bounce * sprint_weapon_bob_rotation_degrees.x),
+			deg_to_rad(lateral_swing * sprint_weapon_bob_rotation_degrees.y),
+			deg_to_rad(lateral_swing * sprint_weapon_bob_rotation_degrees.z)
+		)
+
+	_current_weapon_bob_offset = _current_weapon_bob_offset.lerp(target_weapon_bob_offset, delta * sprint_weapon_bob_smoothing)
+	_current_weapon_bob_rotation = _current_weapon_bob_rotation.lerp(target_weapon_bob_rotation, delta * sprint_weapon_bob_smoothing)
+
+	if view_model_component:
+		view_model_component.apply_bob(_current_weapon_bob_offset, _current_weapon_bob_rotation)
 
 var _stair_head_offset: float = 0.0
 
