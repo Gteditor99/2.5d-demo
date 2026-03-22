@@ -412,6 +412,7 @@ func _update_peek_visuals(delta: float) -> void:
 
 func _update_head_bob(delta: float) -> void:
 	var bob_offset_roll_this_frame: float = 0.0
+	var bob_offset_y: float = 0.0
 	var horizontal_velocity_sq = velocity.x * velocity.x + velocity.z * velocity.z
 	var is_moving_on_floor = is_on_floor() and horizontal_velocity_sq > 0.01
 	var target_bob_amplitude = 0.0
@@ -436,13 +437,17 @@ func _update_head_bob(delta: float) -> void:
 	var bob_phase: float = _bob_time * 2.0 * PI
 
 	if _current_bob_amplitude > 0.001:
-		var bob_offset_y = sin(bob_phase) * _current_bob_amplitude
+		bob_offset_y = sin(bob_phase) * _current_bob_amplitude
 		head_node.position.y = _current_head_y_base + bob_offset_y + _stair_head_offset
 		bob_offset_roll_this_frame = sin(bob_phase * 0.5) * _current_bob_amplitude_roll
 	else:
 		head_node.position.y = lerp(head_node.position.y, _current_head_y_base + _stair_head_offset, delta * 20.0)
 
 	head_node.rotation.z = _current_applied_peek_roll + bob_offset_roll_this_frame + _wasd_tilt
+
+	if view_model_component:
+		view_model_component.position = Vector3(0.0, -bob_offset_y, 0.0)
+		view_model_component.rotation = Vector3(0.0, 0.0, -bob_offset_roll_this_frame)
 
 	var target_weapon_bob_offset := Vector3.ZERO
 	var target_weapon_bob_rotation := Vector3.ZERO
